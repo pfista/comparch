@@ -1,0 +1,27 @@
+# Compiled Source #
+###################
+*.class
+*.o
+
+# Executable #
+##############
+*.out
+
+# Libraries #
+#############
+*.lib
+*.a
+
+# VIM #
+######
+*.swp
+
+# OSX #
+######
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
