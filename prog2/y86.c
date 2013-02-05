@@ -2,19 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*  This should probably be in a header file */
 #define MEMORY  65536 // virtual memory size in bytes, size is equal to 16^4
 #define MAGIC_NUM  0x7962 // y86 signifier
 
 int validateBuffer(unsigned char* buffer, long length);
 void printBuffer(unsigned char* buffer, long length);
 
-typedef unsigned short int load_address; //TODO maybe change this typedef??
-
 struct Block{ //TODO
-    unsigned short int load_address;
-    unsigned short int byte_count;
+    unsigned short load_address;
+    unsigned short byte_count;
     unsigned char* data;
 } Block;
+
+/* END HEADER */
 
 int main (int argc, char* argv[]) 
 {
@@ -42,7 +43,8 @@ int main (int argc, char* argv[])
 
     printf("\n");
     fclose(fp);
-
+    free(buffer);
+    return 0;
 }
 
 /*
@@ -51,17 +53,20 @@ int main (int argc, char* argv[])
 int validateBuffer(unsigned char* buffer, long length) {
 
         // Check for the magic number first
-        unsigned short int mNum = (buffer[0] << 8) + buffer[1];
-        if (mNum != MAGIC_NUM)
+        unsigned short mNum = (buffer[0] << 8) + buffer[1];
+        if (mNum != MAGIC_NUM) {
             printf("mNum: %.4x\nMAGIC:%.4x\n", mNum, MAGIC_NUM);
+            perror("Magic number does not match, this file is not of Y86 format.");
+            exit(0);
+        }
         else
             printf("Magic Number Found Validated!\n");
 
         // begin checking blocks
         int i = 2;
         while (i + 3 < length) {
-            load_address la = (buffer[i] << 8) + buffer[i+1];
-            unsigned short int byte_count = (buffer[i+2] << 8 ) + buffer[i+3];
+            unsigned short la = (buffer[i] << 8) + buffer[i+1];
+            unsigned short byte_count = (buffer[i+2] << 8 ) + buffer[i+3];
 
             printf("load_address: 0x%.4x\nbyteCount: 0x%.4x\n", la, byte_count);
 
@@ -75,7 +80,7 @@ int validateBuffer(unsigned char* buffer, long length) {
             printf("\n");
 
             i += 1 + byte_count;
-            printf("i updated to: 0x%.2x\n", i);
+            printf("i updated to byte: %.2d\n", i);
         }
 }
 
@@ -85,12 +90,11 @@ void printBuffer(unsigned char* buffer, long length)
         printf("file size: %lu bytes\n", length);
 
         for (i = 0; i < length; i++)
-        {
-            printf(" %.2x", buffer[i]);
-        }
+            printf(" %.2d", i);
         printf("\n");
-
-
+        for (i = 0; i < length; i++)
+            printf(" %.2x", buffer[i]);
+        printf("\n");
 }
 
 
