@@ -2,13 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MEMORY  10000 // virtual memory size in bytes
+#define MEMORY  65536 // virtual memory size in bytes, size is equal to 16^4
 #define MAGIC_NUM  0x7962 // y86 signifier
 
 int validateBuffer(unsigned char* buffer, long length);
 void printBuffer(unsigned char* buffer, long length);
 
-typedef unsigned short int load_address;
+typedef unsigned short int load_address; //TODO maybe change this typedef??
+
+struct Block{ //TODO
+    unsigned short int load_address;
+    unsigned short int byte_count;
+    unsigned char* data;
+} Block;
 
 int main (int argc, char* argv[]) 
 {
@@ -23,7 +29,7 @@ int main (int argc, char* argv[])
         fseek(fp, 0, SEEK_END); // find the end of the file
         lSize = ftell(fp); // save the size of the file
         rewind(fp); // go back to beginning of file
-        unsigned char *buffer = (unsigned char*) malloc(sizeof(char)*lSize); //size of char is 1 byte by definition
+        unsigned char* buffer = (unsigned char*) malloc(sizeof(char)*lSize); //size of char is 1 byte by definition
 
         if (buffer == NULL) { perror("Memory error");}
 
@@ -57,7 +63,7 @@ int validateBuffer(unsigned char* buffer, long length) {
             load_address la = (buffer[i] << 8) + buffer[i+1];
             unsigned short int byte_count = (buffer[i+2] << 8 ) + buffer[i+3];
 
-            printf("load_address: 0x%.4X\nbyteCount: 0x%.4X\n", la, byte_count);
+            printf("load_address: 0x%.4x\nbyteCount: 0x%.4x\n", la, byte_count);
 
             i += 3;
 
@@ -69,11 +75,8 @@ int validateBuffer(unsigned char* buffer, long length) {
             printf("\n");
 
             i += 1 + byte_count;
-            printf("i updated to: 0x%.2X\n", i);
+            printf("i updated to: 0x%.2x\n", i);
         }
-
-
-
 }
 
 void printBuffer(unsigned char* buffer, long length)
