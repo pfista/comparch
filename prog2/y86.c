@@ -43,7 +43,7 @@ int main (int argc, char* argv[])
 
     printf("\n");
     fclose(fp);
-    free(buffer);
+    //free(buffer);
     return 0;
 }
 
@@ -53,7 +53,7 @@ int main (int argc, char* argv[])
 int validateBuffer(unsigned char* buffer, long length) {
 
         // Check for the magic number first
-        unsigned short mNum = (buffer[0] << 8) + buffer[1];
+        unsigned short mNum = (unsigned short)buffer[0] << 8 | buffer[1];
         if (mNum != MAGIC_NUM) {
             printf("mNum: %.4x\nMAGIC:%.4x\n", mNum, MAGIC_NUM);
             perror("Magic number does not match, this file is not of Y86 format.");
@@ -66,6 +66,7 @@ int validateBuffer(unsigned char* buffer, long length) {
         int i = 2;
         while (i + 3 < length) {
             unsigned short la = (buffer[i] << 8) + buffer[i+1];
+            // could also do = *(unsigned short)buffer[0]
             unsigned short byte_count = (buffer[i+2] << 8 ) + buffer[i+3];
 
             printf("load_address: 0x%.4x\nbyteCount: 0x%.4x\n", la, byte_count);
@@ -101,3 +102,6 @@ void printBuffer(unsigned char* buffer, long length)
 //TODO create a memory method to store the data in memory according to the load
 //addresses
 
+// make sure if there's a byte count of 3 the file doesn't end befor
+// how big is virtual memory
+// compare each byte before loading into virtual memory
