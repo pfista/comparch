@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 /*  This should probably be in a header file */
-#define MEMORY  131072 // virtual memory size in bytes, size is equal to (16^4)*2
-#define MAGIC_NUM  0x7962 // y86 signifier
+#define MEMORY 131072 // virtual memory size in bytes, size is equal to (16^4)*2
+#define MAGIC_NUM 0x7962 // y86 signifier
 
 int validateBuffer(unsigned char* buffer, long length);
 void printBuffer(unsigned char* buffer, long length);
@@ -16,7 +16,7 @@ struct Block{ //TODO
 } Block;
 
  
-static void* memPtr; //TODO this should probably be hidden in another file
+static char* memPtr; //TODO this should probably be hidden in another file
 
 /* END HEADER */
 
@@ -74,9 +74,14 @@ int validateBuffer(unsigned char* buffer, long length) {
  */
 void loadIntoMemory (unsigned char* buffer, long length, unsigned short loadAddress)
 {
+    unsigned char* ptr = memPtr;
     int i;
-    for (i = 0; i < length; i++)
-        *(unsigned char)memPtr[loadAddress+i] = *(char*)buffer[i];// TODO is this correct
+    for (i = 0; i < length; i++) {
+        ptr = (char*)(memPtr+loadAddress+i);
+        *ptr = buffer[i];// TODO is this correct
+        printf("loaded: %.2x at %.4x\n", (unsigned int)buffer[i], (unsigned int)ptr);
+    }
+
 }
 
 void printBuffer(unsigned char* buffer, long length)
@@ -90,7 +95,9 @@ void printBuffer(unsigned char* buffer, long length)
     for (i = 0; i < length; i++)
         printf(" %.2x", buffer[i]);
     printf("\n");
+
     // begin checking blocks
+    initMemory(MEMORY);
     i = 2;
     while (i + 3 < length) {
         unsigned short la = (buffer[i] << 8) + buffer[i+1];
@@ -101,15 +108,25 @@ void printBuffer(unsigned char* buffer, long length)
 
         i += 3;
 
+        loadIntoMemory(buffer+i, byte_count, la);
+
+        /*
         int j;
         for (j = 1; j <= byte_count; j++)
         {
             printf(" %.2x ", buffer[i+j]);
         }
         printf("\n");
+        */
 
         i += 1 + byte_count;
-        printf("i updated to byte: %.2d\n", i);
+    }
+
+    // actually print the memory in the correct format
+    for (i = 0; i < MEMORY; i++) {
+        if (*(memPtr+i) != 0)
+            printf("%.4x: %.2x\n", i, *(memPtr+i));
+
     }
 }
 
@@ -118,12 +135,18 @@ void printBuffer(unsigned char* buffer, long length)
 
 void initMemory(unsigned int size)
 {
-    memPtr = calloc (size, 1); // Allocate 'size' bytes
+    memPtr = (char*)calloc(size, 1); // Allocate 'size' bytes
+    if (memPtr == NULL) {
+        perror("memory allocation failed");
+        exit (0);
+    }
+    
+    //TODO add boolean for init memory
 }
 
 //TODO read from address
 unsigned char readAddress (unsigned short loadAddress) {
-
+    return *(unsigned char*)(memPtr+loadAddress);
 
 }
 
