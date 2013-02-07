@@ -127,8 +127,8 @@ void loadIntoMemory (unsigned char* buffer, unsigned short byte_count,
     for (i = 0; i < byte_count; i++) {
         ptr = (char*)(memPtr+loadAddress+i);
         *ptr = buffer[i];
-        //printf("loaded: 0x%.2x at 0x%.4x (0x%.2x)\n", buffer[i],
-        //                                    loadAddress+i, ptr);
+        printf("loaded: 0x%.2x at 0x%.4x (0x%.2x)\n", buffer[i],
+                                            loadAddress+i, ptr);
     }
 
 }
@@ -137,7 +137,6 @@ void printBuffer(unsigned char* buffer, unsigned long length)
 {
     int i;
 
-    /*
     printf("file size: %lu bytes\n", length);
     for (i = 0; i < length; i++)
         printf(" %.2d", i);
@@ -145,12 +144,11 @@ void printBuffer(unsigned char* buffer, unsigned long length)
     for (i = 0; i < length; i++)
         printf(" %.2x", buffer[i]);
     printf("\n");
-    */
 
     // actually print the memory in the correct format
     for (i = 0; i < MEMORY; i++) {
         if (*(memPtr+i) != 0)
-            printf("%.4x: %.2x\n", (unsigned char)i, *(unsigned char*)(memPtr+i));
+            printf("%.4x: %.2x\n", (unsigned short)i, *(unsigned char*)(memPtr+i));
 
     }
 }
