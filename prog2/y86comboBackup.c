@@ -1,8 +1,33 @@
 /* UTEID: mp25234 program 2 */
-#include "y86.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+/*  This should probably be in a header file */
+#define MEMORY 131072 // virtual memory size in bytes, size is equal to (16^4)*2
+#define MAGIC_NUM 0x7962 // y86 signifier
+
+typedef enum { false, true } bool;
+
+int loadAndValidate(unsigned char* buffer, unsigned long length);
+void printBuffer(unsigned char* buffer, unsigned long length);
+void loadIntoMemory (unsigned char* buffer, unsigned short byte_count,
+                        unsigned short loadAddress);
+void initMemory(unsigned int size);
+
+struct Block{ //TODO
+    unsigned short load_address;
+    unsigned short byte_count;
+    unsigned char* data;
+} Block;
+
+static char* memPtr; //TODO this should probably be hidden in another file
+static bool memoryHasInitialized;
+
+/* END HEADER */
 
 int main (int argc, char* argv[]) 
 {
+ 
     FILE* fp = fopen(argv[1], "rb"); // open the file based on command line argument
     unsigned char* buffer;
 
@@ -70,7 +95,7 @@ int loadAndValidate(unsigned char* buffer, unsigned long length) {
     int i = 2; // Start at 2 since magic number has been read
     while (i + 3 < length) {
         unsigned short la = (buffer[i] << 8) + buffer[i+1];
-        unsigned short la = (unsigned short*)buffer[i];
+        //unsigned short la = (unsigned short*)buffer[0];
         unsigned short byte_count = (buffer[i+2] << 8 ) + buffer[i+3];
 
         //TODO printf("load_address: 0x%.4x\nbyteCount: 0x%.4x\n", la, byte_count);
