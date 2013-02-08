@@ -12,6 +12,7 @@ int loadAndValidate(unsigned char* buffer, unsigned long length);
 void printBuffer(unsigned char* buffer, unsigned long length);
 void loadIntoMemory (unsigned char* buffer, unsigned short byte_count,
                         unsigned short loadAddress);
+void initMemory(unsigned int size);
 
 struct Block{ //TODO
     unsigned short load_address;
@@ -43,7 +44,6 @@ int main (int argc, char* argv[])
         if (buffer == NULL) { perror("Memory error");}
 
         fread(buffer, 2, lSize, fp); // read in the entire file to buffer
-        //TODO where would i use the Block structure?
 
         memoryHasInitialized = false;
         initMemory(MEMORY);
@@ -55,15 +55,13 @@ int main (int argc, char* argv[])
     }
 
     //Clean up
-    printf("\n");
     fclose(fp);
     free(buffer);
     free (memPtr);
     return EXIT_SUCCESS; 
 }
-
-//TODO make sure if there's a byte count of 3 the file doesn't end befor
-//TODO compare each byte before loading into virtual memory
+//TODO read file directly into memory without using the buffer first.  this way
+//i don't have to go thru the file twice
 
 void initMemory(unsigned int size)
 {
@@ -77,6 +75,7 @@ void initMemory(unsigned int size)
 
 /*
  * Checks to see if the data is valid for Y86 
+ *
  */
 int loadAndValidate(unsigned char* buffer, unsigned long length) {
 
@@ -101,15 +100,15 @@ int loadAndValidate(unsigned char* buffer, unsigned long length) {
 
         //TODO printf("load_address: 0x%.4x\nbyteCount: 0x%.4x\n", la, byte_count);
 
-        i += 3;
+        i += 4;
 
-        if (i+byte_count >= length){
+        if (i+byte_count-1 >= length){
             printf("The Y86 object file is corrupted\n");
             exit(EXIT_FAILURE);
         }
         loadIntoMemory(buffer+i, byte_count, la);
 
-        i += 1 + byte_count;
+        i += byte_count;
     }
     return EXIT_SUCCESS;
 
@@ -127,8 +126,9 @@ void loadIntoMemory (unsigned char* buffer, unsigned short byte_count,
     for (i = 0; i < byte_count; i++) {
         ptr = (char*)(memPtr+loadAddress+i);
         *ptr = buffer[i];
-        printf("loaded: 0x%.2x at 0x%.4x (0x%.2x)\n", buffer[i],
+        /*printf("loaded: 0x%.2x at 0x%.4x (0x%.2x)\n", buffer[i],
                                             loadAddress+i, ptr);
+        */
     }
 
 }
@@ -137,6 +137,7 @@ void printBuffer(unsigned char* buffer, unsigned long length)
 {
     int i;
 
+   /* 
     printf("file size: %lu bytes\n", length);
     for (i = 0; i < length; i++)
         printf(" %.2d", i);
@@ -144,22 +145,16 @@ void printBuffer(unsigned char* buffer, unsigned long length)
     for (i = 0; i < length; i++)
         printf(" %.2x", buffer[i]);
     printf("\n");
+   */ 
 
     // actually print the memory in the correct format
     for (i = 0; i < MEMORY; i++) {
         if (*(memPtr+i) != 0)
-            printf("%.4x: %.2x\n", (unsigned short)i, *(unsigned char*)(memPtr+i));
-
+            printf("%.4X: %.2X\n", (unsigned short)i, *(unsigned char*)(memPtr+i));
     }
 }
 
-
-//TODO read from address
 unsigned char readAddress (unsigned short loadAddress) {
     return *(unsigned char*)(memPtr+loadAddress);
 
 }
-
-//TODO write to an addres
-
-//TODO shut memory down
