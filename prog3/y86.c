@@ -26,7 +26,7 @@ int main (int argc, char* argv[])
             printf("The Y86 object file is corrupted\n");
             exit(EXIT_FAILURE);
         }
-        printBuffer(buffer, lSize);
+        printMemory();
     }
     //Clean up
     fclose(fp);
@@ -69,7 +69,7 @@ int loadAndValidate(unsigned char* buffer, unsigned long length) {
     int i = 2; // Start at 2 since magic number has been read
     while (i + 3 < length) {
         unsigned short la = (buffer[i] << 8) + buffer[i+1];
-        unsigned short la = (unsigned short*)buffer[i];
+        //unsigned short la = (unsigned short*)buffer[i];
         unsigned short byte_count = (buffer[i+2] << 8 ) + buffer[i+3];
 
         //TODO printf("load_address: 0x%.4x\nbyteCount: 0x%.4x\n", la, byte_count);
@@ -104,31 +104,32 @@ void loadIntoMemory (unsigned char* buffer, unsigned short byte_count,
                                             loadAddress+i, ptr);
         */
     }
+    // Update minimum and maximum load addresses used
+    if (loadAddress < minAddress) {
+        minAddress = loadAddress;
+    }
+    if (loadAddress + byte_count - 1 > maxAddress) {
+        maxAddress = loadAddress + byte_count -1;
+    }
 
 }
 
-void printBuffer(unsigned char* buffer, unsigned long length)
-{
+void printMemory(void) {
     int i;
-
-   /* 
-    printf("file size: %lu bytes\n", length);
-    for (i = 0; i < length; i++)
-        printf(" %.2d", i);
-    printf("\n");
-    for (i = 0; i < length; i++)
-        printf(" %.2x", buffer[i]);
-    printf("\n");
-   */ 
-
     // actually print the memory in the correct format
-    for (i = 0; i < MEMORY; i++) {
-        if (*(memPtr+i) != 0)
-            printf("%.4X: %.2X\n", (unsigned short)i, *(unsigned char*)(memPtr+i));
+    for (i = minAddress; i <= maxAddress; i++) {
+        unsigned int littleEndian;
+        
+        // Form little Endian from big Endian
+        littleEndian = readAddress(i) | 
+                       readAddress(i+1) << 8 | 
+                       readAddress(i+2) << 16 |
+                       readAddress(i+3) << 24;
+
+        printf("%04X %02X %08X %11d\n", i, littleEndian & 0xFF, littleEndian, littleEndian);
     }
 }
 
-unsigned char readAddress (unsigned short loadAddress) {
-    return *(unsigned char*)(memPtr+loadAddress);
-
+unsigned int readAddress (unsigned short loadAddress) {
+    return (unsigned int)memPtr[loadAddress]; 
 }

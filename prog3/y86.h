@@ -8,10 +8,11 @@
 typedef enum { false, true } bool;
 
 int loadAndValidate(unsigned char* buffer, unsigned long length);
-void printBuffer(unsigned char* buffer, unsigned long length);
 void loadIntoMemory (unsigned char* buffer, unsigned short byte_count,
                         unsigned short loadAddress);
 void initMemory(unsigned int size);
+void printMemory(void);
+unsigned int readAddress(unsigned short loadAddress);
 
 struct Block{ //TODO
     unsigned short load_address;
@@ -19,5 +20,7 @@ struct Block{ //TODO
     unsigned char* data;
 } Block;
 
-static char* memPtr; //TODO this should probably be hidden in another file
+static unsigned char* memPtr; //TODO this should probably be hidden in another file
 static bool memoryHasInitialized;
+unsigned int maxAddress = 0;
+unsigned int minAddress = MEMORY;
