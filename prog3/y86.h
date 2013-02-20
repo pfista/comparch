@@ -1,4 +1,4 @@
-/* UTEID: mp25234 program 2 */
+/* UTEID: mp25234 program 3 */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,21 +7,51 @@
 
 typedef enum { false, true } bool;
 
+/******** FUNCTIONS *********/
+
+/*
+ * Checks to see if the data is valid for Y86 while loading the data into
+ * virtual memory
+ */
 int loadAndValidate(unsigned char* buffer, unsigned long length);
+
+/*
+ * pre: memory has been allocated
+ * load bytes into memory consecutively
+ */
 void loadIntoMemory (unsigned char* buffer, unsigned short byte_count,
                         unsigned short loadAddress);
+
 void initMemory(unsigned int size);
+
+/*
+ * Prints all memory between the mix and max load address
+ * in little endian with corresponding y86 instructions
+ */
 void printMemory(void);
+
+/* 
+ * Read an address from memory.
+ */
 unsigned int readAddress(unsigned short loadAddress);
+
 char* getOpcode(int opcode);
 
-struct Block{ //TODO
+/******** END FUNCTIONS *********/
+
+/*struct Block{ //TODO
     unsigned short load_address;
     unsigned short byte_count;
     unsigned char* data;
 } Block;
+*/
 
-static unsigned char* memPtr; //TODO this should probably be hidden in another file
+
+/******** VARIABLES *********/
+
+static unsigned char* memPtr; //TODO hide in another file? like memory.c
 static bool memoryHasInitialized;
 unsigned int maxAddress = 0;
 unsigned int minAddress = MEMORY;
+
+/******** END VARIABLES *********/
