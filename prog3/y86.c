@@ -126,10 +126,44 @@ void printMemory(void) {
                        readAddress(i+2) << 16 |
                        readAddress(i+3) << 24;
 
-        printf("%04X %02X %08X %11d\n", i, littleEndian & 0xFF, littleEndian, littleEndian);
+        printf("%04X %02X %08X %11d %s\n", i, littleEndian & 0xFF, littleEndian, 
+                littleEndian, getOpcode(littleEndian & 0xFF));
     }
 }
 
 unsigned int readAddress (unsigned short loadAddress) {
     return (unsigned int)memPtr[loadAddress]; 
+}
+
+char* getOpcode(int opcode) {
+    switch (opcode) {
+        case 0x0: return("halt");
+        case 0x10: return("nop");
+        case 0x20: return("rrmovl");
+        case 0x30: return("irmovl");
+        case 0x40: return("rmmovl");
+        case 0x50: return("mrmovl");
+        case 0x80: return("call");
+        case 0x90: return("ret");
+        case 0xA0: return("pushl");
+        case 0xB0: return("popl");
+        case 0x21: return("cmovle");
+        case 0x22: return("cmovl");
+        case 0x23: return("cmove");
+        case 0x24: return("cmovne");
+        case 0x25: return("cmovge");
+        case 0x26: return("cmovg");
+        case 0x60: return("addl");
+        case 0x61: return("subl");
+        case 0x62: return("andl");
+        case 0x63: return("xorl");
+        case 0x70: return("jmp");
+        case 0x71: return("jle");
+        case 0x72: return("jl");
+        case 0x73: return("je");
+        case 0x74: return("jne");
+        case 0x75: return("jge");
+        case 0x76: return("jg");
+        default: return("invalid");
+    }
 }

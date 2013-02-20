@@ -25,3 +25,5 @@ static unsigned char* memPtr; //TODO this should probably be hidden in another f
 static bool memoryHasInitialized;
 unsigned int maxAddress = 0;
 unsigned int minAddress = MEMORY;
+
+/* END HEADER FILE */
