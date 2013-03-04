@@ -7,39 +7,45 @@
 typedef struct {
     unsigned int inDegree;
     char* symbolName;
-    struct symbol *nextSymbols;
+    struct symbol *symbolsAfter;
+    struct symbol *nextSymbol;
 }symbol;
+
+typedef struct {
+    symbol* first;
+    symbol* last;
+}symbolTable;
+
+typedef struct {
+    char* name;
+    struct stringList *next;
+}stringList;
 
 void setSymbolName (symbol *sym, char *name);
 char* readNextSymbolPair (FILE *fp);
-
 int main (int argc, char* argv[]) {
 
     FILE* fp = fopen(argv[1], "r");
     readNextSymbolPair(fp);
     readNextSymbolPair(fp);
     readNextSymbolPair(fp);
-    readNextSymbolPair(fp);
-    readNextSymbolPair(fp);
-    readNextSymbolPair(fp);
 
-    /*
-    symbol *root;
-    symbol *currentSymbol;
-    root = malloc (sizeof(symbol));
-    currentSymbol = root;
-
-    if (currentSymbol != 0) {
-        while (currentSymbol->nextSymbol != 0) {
-            printf ("%d\n", currentSymbol->inDegree);
-        }
-    }
-
-    setSymbolName(root, "root");
-    root->nextSymbol = malloc(sizeof(symbol));
-    */
+    symbolTable* symbols = malloc(sizeof(symbolTable));
 
     fclose(fp);
+}
+
+symbol* getSymbol(symbol *root, char* name) {
+    symbol *currentSymbol = root;
+    while (currentSymbol != NULL) { 
+        if (currentSymbol->symbolName == name)
+            return currentSymbol;
+        else if (currentSymbol->nextSymbol != NULL)
+            currentSymbol = currentSymbol->nextSymbol;
+    }
+    
+    // Symbol wasn't found
+    return NULL;
 }
 
 void setSymbolName (symbol *sym, char *name) {
@@ -53,7 +59,7 @@ void setSymbolName (symbol *sym, char *name) {
  * Reads a line and stores the symbols and dependencies into the table
  * while checking for correct format.
  */
-char* readNextSymbolPair (FILE* fp) {
+void readNextSymbolPair (FILE* fp) {
     if (fp == NULL)
         perror("Error opening file");
 
@@ -93,5 +99,3 @@ char* readNextSymbolPair (FILE* fp) {
         printf ("symbol: %s\n", buffer);
     #endif
 }   
-
-
