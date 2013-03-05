@@ -1,28 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "topoSort.h"
 
-#define DEFAULT_SYMBOL_LENGTH 256;
-    
-typedef struct {
-    unsigned int inDegree;
-    char* symbolName;
-    struct symbol *symbolsAfter;
-    struct symbol *nextSymbol;
-}symbol;
-
-typedef struct {
-    symbol* first;
-    symbol* last;
-}symbolTable;
-
-typedef struct {
-    char* name;
-    struct stringList *next;
-}stringList;
-
-void setSymbolName (symbol *sym, char *name);
-char* readNextSymbolPair (FILE *fp);
 int main (int argc, char* argv[]) {
 
     FILE* fp = fopen(argv[1], "r");
@@ -55,6 +32,11 @@ void setSymbolName (symbol *sym, char *name) {
     strcpy(sym->symbolName, name);
 }
 
+void addSymbolToTable (symbol *sym) {
+
+
+}
+
 /*
  * Reads a line and stores the symbols and dependencies into the table
  * while checking for correct format.
@@ -77,6 +59,15 @@ void readNextSymbolPair (FILE* fp) {
             #ifdef DEBUG
                 printf ("symbol: %s\n", buffer);
             #endif
+
+            symbol* sym = malloc(sizeof(symbol));
+            sym->inDegree=0;
+            setSymbolName(sym, buffer);
+            // if buffer !exists in symbol table
+            addSymbolToTable(sym);
+
+             
+
         }
         else {
             if (current_length < total_length) {
@@ -95,7 +86,11 @@ void readNextSymbolPair (FILE* fp) {
         }
         c = fgetc(fp);
     }
+
+
     #ifdef DEBUG
         printf ("symbol: %s\n", buffer);
     #endif
+        
+    free(buffer);
 }   
