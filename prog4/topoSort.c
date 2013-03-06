@@ -1,15 +1,18 @@
 #include "topoSort.h"
 
+static symbolTable* symbols;
+
 int main (int argc, char* argv[]) {
 
     FILE* fp = fopen(argv[1], "r");
     readNextSymbolPair(fp);
     readNextSymbolPair(fp);
     readNextSymbolPair(fp);
-
-    symbolTable* symbols = malloc(sizeof(symbolTable));
+    
+    symbols = malloc(sizeof(symbolTable));
 
     fclose(fp);
+    free(symbols);
 }
 
 symbol* getSymbol(symbol *root, char* name) {
@@ -17,8 +20,8 @@ symbol* getSymbol(symbol *root, char* name) {
     while (currentSymbol != NULL) { 
         if (currentSymbol->symbolName == name)
             return currentSymbol;
-        else if (currentSymbol->nextSymbol != NULL)
-            currentSymbol = currentSymbol->nextSymbol;
+        else if (currentSymbol->next != NULL)
+            currentSymbol = currentSymbol->next;
     }
     
     // Symbol wasn't found
@@ -32,9 +35,38 @@ void setSymbolName (symbol *sym, char *name) {
     strcpy(sym->symbolName, name);
 }
 
-void addSymbolToTable (symbol *sym) {
+symbol* add_symbol_to_table (char* buffer) {
 
+    // Find or create the symbol as needed
+    symbol* sym = symbols->first;
+    while (sym != NULL) {
+        if (sym->symbolName == buffer)
+            break;         
+        sym = sym->next;
+    }
+    if (sym == NULL) {
+        // Actually create the symbol from the buffer
+        sym = malloc(sizeof(symbol));
+        if (sym == NULL) {
+            printf("error mallocing symbol");
+            exit (EXIT_FAILURE);
+        }
+        sym->inDegree=0;
+        setSymbolName(sym, buffer);
+        //update symbol.next
+    }
 
+    // Adjust the symbolTable pointers
+    if (symbols->first == NULL) {
+       symbols->first = sym; 
+       symbols->last = sym;
+    }
+    else {
+        symbols->last->next = sym;
+        symbols->last = sym;
+    }
+    
+    return sym;
 }
 
 /*
@@ -49,24 +81,32 @@ void readNextSymbolPair (FILE* fp) {
     int total_length = DEFAULT_SYMBOL_LENGTH;
     int current_length = 0;
     char* buffer = malloc(sizeof(char)*total_length+1);
+    if (buffer == NULL)
+        exit(EXIT_FAILURE);
+    bool foundFirst = false;
+    symbol* firstSymbol;
+    symbol* secondSymbol;
 
     int c = fgetc(fp); 
     while (c != EOF && c!='\n') {
-        if (c == ' ') { // start a new symbol
-            // first symbol has been read into the buffer.  store this in the
-            // structure table now
-            //TODO store in symbol table
+        if (c == ' ') {
+            if (foundFirst){ // A symbol has already been found
+                perror("Too many input symbols on line");
+                exit(EXIT_FAILURE);
+            }
+
+            firstSymbol = add_symbol_to_table(buffer);
+            // Reset buffer for second symbol
+            free(buffer);
+            buffer = malloc(sizeof(char)*total_length+1);
+            if (buffer == NULL)
+                exit(EXIT_FAILURE);
+            current_length = 0;
+            foundFirst = true;
+            
             #ifdef DEBUG
-                printf ("symbol: %s\n", buffer);
+                printf ("first symbol: %s\n", firstSymbol->symbolName);
             #endif
-
-            symbol* sym = malloc(sizeof(symbol));
-            sym->inDegree=0;
-            setSymbolName(sym, buffer);
-            // if buffer !exists in symbol table
-            addSymbolToTable(sym);
-
-             
 
         }
         else {
@@ -87,10 +127,14 @@ void readNextSymbolPair (FILE* fp) {
         c = fgetc(fp);
     }
 
+    secondSymbol = add_symbol_to_table(buffer);
+    free(buffer);
+    //TODO addSymbolAfter(firstSymbol, secondSymbol);
+        // must check to see if secondSymbol exists there already
+    secondSymbol->inDegree++;
 
     #ifdef DEBUG
-        printf ("symbol: %s\n", buffer);
+        printf ("second symbol: %s\n", secondSymbol->symbolName);
     #endif
         
-    free(buffer);
 }   

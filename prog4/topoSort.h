@@ -4,7 +4,7 @@
 
 #define DEFAULT_SYMBOL_LENGTH 256;
     
-typedef struct {
+typedef struct symbol {
     unsigned int inDegree;
     char* symbolName;
     struct symbolsAfter *listOfSymbolsAfter;
@@ -21,10 +21,14 @@ typedef struct {
     struct symbolsAfter *nextSym;
 }symbolsAfter;
 
+typedef enum {false, true} bool;
+
 void setSymbolName (symbol *sym, char *name);
 void readNextSymbolPair (FILE *fp);
+symbol* add_symbol_to_table(char* buffer);
 
 
+/*  
 try to find a, return pointer to it if exists else
 if (!A exists)
     add symbol to list
@@ -49,3 +53,4 @@ addBtoSymbolsAfterList
 
 remove a zero from top of list
     go thru symbols after
+    */
