@@ -7,8 +7,8 @@
 typedef struct symbol {
     unsigned int inDegree;
     char* symbolName;
-    struct symbolsAfter *listOfSymbolsAfter;
-    struct symbol *next;
+    struct symbolsAfter* curSymbolAfter;
+    struct symbol* next;
 }symbol;
 
 typedef struct {
@@ -16,41 +16,23 @@ typedef struct {
     symbol* last;
 }symbolTable;
 
-typedef struct {
+typedef struct symbolsAfter {
     struct symbol *sym;
-    struct symbolsAfter *nextSym;
+    struct symbolsAfter *nextSymAfter;
 }symbolsAfter;
 
 typedef enum {false, true} bool;
 
 void setSymbolName (symbol *sym, char *name);
-void readNextSymbolPair (FILE *fp);
+void read_file(FILE *fp);
+bool readNextSymbolPair (FILE *fp);
 symbol* add_symbol_to_table(char* buffer);
+symbolsAfter* init_symbol_after();
+void sym_after_exists(symbol* symb, symbol* symAfter);
+void add_symbol_after(symbol* symb, symbol* symAfter);
 
 
-/*  
-try to find a, return pointer to it if exists else
-if (!A exists)
-    add symbol to list
-
-try to find b, return pointer to it if exists else
-if (!B exists)
-    add symbol to list
-
-A->addBtoSymbolsAfterList
-B->inDegree++
-    
-
-
-add symbol to list
-    malloc(symbol)
-    setLast -> newSymbol
-
-addBtoSymbolsAfterList
-    malloc(symbolsAfter)
-    set sym* -> B
-    
-
+/*
 remove a zero from top of list
     go thru symbols after
     */
