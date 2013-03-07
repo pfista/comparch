@@ -3,7 +3,6 @@
 static symbolTable* symbols;
 
 int main (int argc, char* argv[]) {
-
     FILE* fp = fopen(argv[1], "r");
     // Create the symbol table
     symbols = malloc(sizeof(symbolTable));
@@ -12,7 +11,31 @@ int main (int argc, char* argv[]) {
 
     read_file(fp);
 
+    print_symbol_table();
+
+    // Now print the symbols in order
     symbol* current;
+    for (current = symbols->first; current != NULL; current = current->next) {
+        if (current->inDegree == 0) {
+            symbolsAfter* curA;
+            for (curA = current->curSymbolAfter; curA != NULL; curA = curA->nextSymAfter) {
+                curA->sym->inDegree--;
+            }
+            current->inDegree = -1;
+            printf("%s ", current->symbolName);
+            current = symbols->first;
+        }
+
+            print_symbol_table();
+    }
+
+    fclose(fp);
+    free(symbols);
+}
+
+void print_symbol_table() {
+    symbol* current;
+    printf("*************\n");
     for (current = symbols->first; current != NULL; current = current->next) {
         printf("Name: %s\n", current->symbolName);
         printf("In-Degree: %d\n", current->inDegree);
@@ -20,14 +43,12 @@ int main (int argc, char* argv[]) {
         for (curA = current->curSymbolAfter; curA != NULL; curA = curA->nextSymAfter) {
             printf("\tSymbol After: %s\n", curA->sym->symbolName);
         }
-        printf("^^\n\n");
+        printf("\n");
     }
 
-    fclose(fp);
-    free(symbols);
 }
 
-symbol* getSymbol(char* name) {
+symbol* get_symbol(char* name) {
     symbol* currentSymbol = symbols->first;
     while (currentSymbol != NULL) { 
         if (strcmp(currentSymbol->symbolName,name) == 0) {
@@ -39,7 +60,7 @@ symbol* getSymbol(char* name) {
     return NULL;
 }
 
-void setSymbolName (symbol *sym, char *name) {
+void set_symbol_name (symbol *sym, char *name) {
     #ifdef DEBUG
         printf ("copying from buffer to alloced symbol: %s\n", name);
     #endif
@@ -81,12 +102,12 @@ symbol* add_symbol_to_table (char* buffer) {
 
     // Find or create the symbol as needed
     if (symbols->first != NULL) {
-        sym = getSymbol(buffer); 
+        sym = get_symbol(buffer); 
     }
     if (sym == NULL) { // Symbol wasn't found
         // Actually create the symbol from the buffer
         sym = init_symbol();
-        setSymbolName(sym, buffer);
+        set_symbol_name(sym, buffer);
     }
     else {
         // Don't need to update table, return early since sym has been found
@@ -122,9 +143,6 @@ void add_symbol_after (symbol* symb, symbol* symAfter) {
 
 }
 
-/*
- * Check to see if a symbolsAfter exists for a symbol
- */
 void sym_after_exists(symbol* symb, symbol* symAfter) {
     symbolsAfter* current = symb->curSymbolAfter;
     while (current != NULL) {
@@ -137,14 +155,10 @@ void sym_after_exists(symbol* symb, symbol* symAfter) {
 }
 
 void read_file(FILE* fp) {
-    while (readNextSymbolPair(fp));
+    while (read_next_symbol_pair(fp));
 }
 
-/*
- * Reads a line and stores the symbols and dependencies into the table
- * while checking for correct format.
- */
-bool readNextSymbolPair (FILE* fp) {
+bool read_next_symbol_pair (FILE* fp) {
     if (fp == NULL)
         perror("Error opening file");
 
@@ -212,5 +226,4 @@ bool readNextSymbolPair (FILE* fp) {
     #endif
 
     return true;
-        
 }   

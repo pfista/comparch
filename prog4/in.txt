@@ -1,5 +1,2 @@
-word barneystanson
-name d
-bedframebedframebedframe darwin
-name darwin
-d new
+d f
+a c
