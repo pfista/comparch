@@ -1,50 +1,155 @@
 #include "topoSort.h"
 
-static symbolTable* symbols;
-
 int main (int argc, char* argv[]) {
     FILE* fp = fopen(argv[1], "r");
     // Create the symbol table
     symbols = malloc(sizeof(symbolTable));
     symbols->first = NULL;
     symbols->last = NULL;
+    symbols->size = 0;
+
+    //Create the sortedSymbols list
+    sortedSyms = malloc(sizeof(sortedSymbolList));
+    sortedSyms->first = NULL;
+    sortedSyms->size = 0;
 
     read_file(fp);
+    
+    /*print_symbol_table();*/
+    print_topo_order(); 
 
-    print_symbol_table();
-
-    // Now print the symbols in order
-    symbol* current;
-    for (current = symbols->first; current != NULL; current = current->next) {
-        if (current->inDegree == 0) {
-            symbolsAfter* curA;
-            for (curA = current->curSymbolAfter; curA != NULL; curA = curA->nextSymAfter) {
-                curA->sym->inDegree--;
-            }
-            current->inDegree = -1;
-            printf("%s ", current->symbolName);
-            current = symbols->first;
-        }
-
-            print_symbol_table();
-    }
 
     fclose(fp);
     free(symbols);
+    free(sortedSyms);
 }
 
-void print_symbol_table() {
+bool print_topo_order(void) {
+    // Now print the symbols in order
     symbol* current;
-    printf("*************\n");
+    while (symbols->size > 0) {
+    #ifdef DEBUG
+        print_symbol_table();
+    #endif
+        for (current = symbols->first; current != NULL; current = current->next) {
+            if (current->inDegree == 0) {
+                // Add to sorted list
+                add_symbol_to_sorted(current);
+            }
+        }
+        #ifdef DEBUG
+            print_sorted_symbols();
+        #endif
+        if (sortedSyms->size == 0) {
+            perror("This cannot be solved, there is a cycle");
+            exit(EXIT_FAILURE);
+        }
+        else {
+            // Now go thru sorted list, print, decrement the indegrees,  and free all the data
+            sortedSymbol* currentSorted;
+            for (currentSorted = sortedSyms->first; currentSorted != NULL; currentSorted = currentSorted->next) {
+                printf("%s ", currentSorted->sym->symbolName);
+                symbolsAfter* symA;
+                for (symA = currentSorted->sym->curSymbolAfter; symA != NULL; symA = symA->nextSymAfter) {
+                    /*Go thru the current symbol's "symbolsAfter" list and decrement
+                     *their in-degree
+                     */
+                    symA->sym->inDegree--;
+                }
+    #ifdef DEBUG
+        printf("printing new In Degrees after traversing sorted list\n");
+        print_symbol_table();
+    #endif
+            }
+            destroy_sorted_symbols();
+        }
+    }
+    printf("\n");
+}
+
+// Frees the sorted Symbol list as well as the associated symbols in the symbol
+// table
+void destroy_sorted_symbols(void) {
+    sortedSymbol* ssym = sortedSyms->first;
+    while (ssym != NULL) {
+        remove_symbol(ssym->sym);
+        sortedSymbol* temp = ssym; 
+        ssym = ssym->next;
+        free(temp);
+    }
+    sortedSyms->size = 0;
+    sortedSyms->first = NULL;
+}
+
+void remove_sorted_symbol() {
+
+
+}
+
+void remove_symbol(symbol* sym) {
+    #ifdef DEBUG
+        printf ("Removing symbol %s\n", sym->symbolName);
+    #endif
+    if (symbols->size > 0) {
+        if (sym->prev != NULL) {
+            sym->prev->next = sym->next;
+        }
+        if (sym->next != NULL) { 
+            sym->next->prev = sym->prev;
+        }
+        // destroy curSymbolsAfter
+        if (symbols->first == sym)
+            symbols->first = sym->next;
+
+        free(sym->symbolName);
+        sym->next = NULL;
+        sym->prev = NULL;
+        destroy_symbols_after(sym->curSymbolAfter);
+        free(sym);
+        symbols->size--;
+    }
+    #ifdef DEBUG
+        printf ("Done removing symbol\n");
+    #endif
+
+}
+
+void destroy_symbols_after(symbolsAfter* symbolsAfter) {
+    #ifdef DEBUG
+        printf ("\tDestroying symbols after\n");
+    #endif
+    if (symbolsAfter != NULL) {
+        // The sym will be destroy by remove_symbol very soon
+        destroy_symbols_after(symbolsAfter->nextSymAfter);
+        free(symbolsAfter);
+    }
+}
+
+
+// TODO clean lists that frees sortedSymbol list and symbolTable
+
+void print_symbol_table(void) {
+    symbol* current;
+    printf("***Symbol Table***\n");
     for (current = symbols->first; current != NULL; current = current->next) {
-        printf("Name: %s\n", current->symbolName);
-        printf("In-Degree: %d\n", current->inDegree);
+        printf("\tName: %s\n", current->symbolName);
+        printf("\tIn-Degree: %d\n", current->inDegree);
         symbolsAfter* curA;
         for (curA = current->curSymbolAfter; curA != NULL; curA = curA->nextSymAfter) {
-            printf("\tSymbol After: %s\n", curA->sym->symbolName);
+            printf("\t\tSymbol After: %s\n", curA->sym->symbolName);
         }
         printf("\n");
     }
+
+}
+
+void print_sorted_symbols(void) {
+    sortedSymbol* current;
+    printf("***printing Sorted Symbols***\n[ ");
+    for (current = sortedSyms->first; current != NULL; current = current->next) {
+        printf("%s, ", current->sym->symbolName);
+    }
+    printf("]\n****\n");
 
 }
 
@@ -60,11 +165,11 @@ symbol* get_symbol(char* name) {
     return NULL;
 }
 
-void set_symbol_name (symbol *sym, char *name) {
+void set_symbol_name (symbol *sym, char *name, int length) {
     #ifdef DEBUG
         printf ("copying from buffer to alloced symbol: %s\n", name);
     #endif
-    sym->symbolName = malloc(sizeof(name) + 1);
+    sym->symbolName = malloc(sizeof(char)*length);
     if (sym->symbolName == NULL)
         printf("error mallocing symbolName");
     strcpy(sym->symbolName, name);
@@ -80,6 +185,7 @@ symbol* init_symbol() {
     sym->symbolName = NULL;
     sym->curSymbolAfter = NULL;
     sym->next = NULL;
+    sym->prev = NULL;
     return sym;
 }
 
@@ -94,20 +200,21 @@ symbolsAfter* init_symbol_after() {
     return symA;
 }
 
-symbol* add_symbol_to_table (char* buffer) {
+symbol* add_symbol_to_table (char* buffer, int size) {
     symbol* sym = NULL;
     #ifdef DEBUG
         printf ("adding symbol with buffer: %s\n", buffer);
     #endif
 
     // Find or create the symbol as needed
-    if (symbols->first != NULL) {
+    if (symbols->size > 0) {
         sym = get_symbol(buffer); 
     }
+
     if (sym == NULL) { // Symbol wasn't found
         // Actually create the symbol from the buffer
         sym = init_symbol();
-        set_symbol_name(sym, buffer);
+        set_symbol_name(sym, buffer, size);
     }
     else {
         // Don't need to update table, return early since sym has been found
@@ -115,15 +222,16 @@ symbol* add_symbol_to_table (char* buffer) {
     }
 
     // Adjust the symbolTable pointers
-    if (symbols->first == NULL) {
+    if (symbols->size == 0) {
         symbols->first = sym; 
         symbols->last = sym;
-        symbols->first->next = NULL;
     }
     else {
         symbols->last->next = sym; // Point the previous last's next to the new last
+        sym->prev = symbols->last;
         symbols->last = sym;
     }
+    symbols->size++;
     return sym;
 }
 
@@ -169,6 +277,9 @@ bool read_next_symbol_pair (FILE* fp) {
     if (buffer == NULL)
         exit(EXIT_FAILURE);
     bool foundFirst = false;
+    bool foundBoth = false;
+    bool foundThird = false;
+    bool firstStarted = false;
     symbol* firstSymbol;
     symbol* secondSymbol;
 
@@ -177,33 +288,50 @@ bool read_next_symbol_pair (FILE* fp) {
         free(buffer);
         return false;
     }
+    else if (c == '\n')
+        return;
     while (c!='\n') {
         if (c == ' ') {
-            if (foundFirst){ // A symbol has already been found
-                perror("Too many input symbols on line");
-                exit(EXIT_FAILURE);
+            if (!foundFirst){ // A symbol has already been found
+                // skip this character
+                buffer[current_length] = '\0';
+                firstSymbol = add_symbol_to_table(buffer,current_length+1);
+                // Reset buffer for second symbol
+                free(buffer);
+                buffer = malloc(sizeof(char)*total_length);
+                if (buffer == NULL)
+                    exit(EXIT_FAILURE);
+                current_length = 0;
+                foundFirst = true;
+                
+                #ifdef DEBUG
+                    printf ("first symbol: %s\n", firstSymbol->symbolName);
+                #endif
+            }
+            if (foundBoth) {
+                foundThird = true;
             }
 
-            firstSymbol = add_symbol_to_table(buffer);
-            // Reset buffer for second symbol
-            free(buffer);
-            buffer = malloc(sizeof(char)*total_length+1);
-            if (buffer == NULL)
-                exit(EXIT_FAILURE);
-            current_length = 0;
-            foundFirst = true;
-            
-            #ifdef DEBUG
-                printf ("first symbol: %s\n", firstSymbol->symbolName);
-            #endif
         }
         else {
-            if (current_length < total_length) {
+            if (current_length < total_length-1) {
                 buffer[current_length++] = c; // increment current_length after storing c
+                if (!foundFirst) {
+                    firstStarted = true;
+                }
+                if (foundFirst)
+                    foundBoth = true;
+                if (foundThird) {
+                    perror("found too many symbols on line\n");
+                    exit(EXIT_FAILURE);
+                }
             }
             else { // buffer has run out of space
+                #ifdef DEBUG
+                    printf ("DOUBLING BUFFER**\n");
+                #endif
                 total_length *= 2; // double size of buffer
-                void* tempBuff = realloc(buffer, total_length*sizeof(char)+1);
+                void* tempBuff = realloc(buffer, total_length*sizeof(char));
                 if (tempBuff == NULL) {
                     free(buffer);
                     perror("Error reallocating");
@@ -214,8 +342,16 @@ bool read_next_symbol_pair (FILE* fp) {
         }
         c = fgetc(fp);
     }
+    // Exits if only one symbol was found on a line
+    if (!foundFirst && firstStarted) {
+        perror("not enough symbols on line");
+        exit(EXIT_FAILURE);
+    }
+    else if (!firstStarted)
+        return true; // Blank line with spaces only, exit
 
-    secondSymbol = add_symbol_to_table(buffer);
+    buffer[current_length] = '\0';
+    secondSymbol = add_symbol_to_table(buffer,current_length+1);
     free(buffer);
     add_symbol_after(firstSymbol, secondSymbol);
     secondSymbol->inDegree++;
@@ -227,3 +363,58 @@ bool read_next_symbol_pair (FILE* fp) {
 
     return true;
 }   
+void add_symbol_to_sorted(symbol* sym){
+    sortedSymbol* symToAdd = init_sorted_symbol();
+    symToAdd->sym = sym;
+    if (sortedSyms->size == 0){
+        sortedSyms->first = symToAdd;
+        sortedSyms->size++;
+        return;
+    }
+    else if (sortedSyms->size == 1) {
+        if (strcmp(symToAdd->sym->symbolName, sortedSyms->first->sym->symbolName) < 0) {
+            // Add at beginning of sorted list
+            symToAdd->next = sortedSyms->first;
+            sortedSyms->first = symToAdd;
+        }
+        else
+            // Add to end of sorted list
+            sortedSyms->first->next = symToAdd;
+        sortedSyms->size++;
+        return;
+    }
+    else {
+        // Insert in the correct place to remain sorted
+        sortedSymbol* current;
+        sortedSymbol* prev = NULL;
+        for (current = sortedSyms->first; current != NULL; current = current->next){
+            if (strcmp(symToAdd->sym->symbolName, current->sym->symbolName) < 0) {
+                if (prev == NULL) { // Cur at first position in list
+                    symToAdd->next = current;
+                    sortedSyms->first = symToAdd;
+                }
+                else {
+                    prev->next = symToAdd;
+                    symToAdd->next = current;
+                }
+                sortedSyms->size++;
+                return;
+            }
+            prev = current;
+        }
+        // Check edge case for last spot
+        if (strcmp(symToAdd->sym->symbolName, prev->sym->symbolName) > 0) {
+            prev->next = symToAdd;
+            sortedSyms->size++;
+            return;
+        }
+    }
+
+}
+
+sortedSymbol* init_sorted_symbol() {
+    sortedSymbol* ssym = malloc(sizeof(sortedSymbol));
+    ssym->sym = NULL;
+    ssym->next = NULL;
+    return ssym;
+}
