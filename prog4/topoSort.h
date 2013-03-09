@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEFAULT_SYMBOL_LENGTH 4;
+#define DEFAULT_SYMBOL_LENGTH 256;
     
 typedef struct symbol {
     unsigned int inDegree;
@@ -38,9 +38,7 @@ static sortedSymbolList* sortedSyms;
 
 typedef enum {false, true} bool;
 
-//TODO free everything correctly
 void remove_symbol(symbol* sym);
-void remove_sorted_symbol(void);
 void destroy_symbols_after(symbolsAfter* symbolsAfter);
 void destroy_sorted_symbols(void);
 
@@ -130,6 +128,3 @@ bool read_next_symbol_pair (FILE *fp);
 
 sortedSymbol* init_sorted_symbol(void);
 void add_symbol_to_sorted(symbol* sym);
-
-
-

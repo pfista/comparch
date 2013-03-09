@@ -15,9 +15,7 @@ int main (int argc, char* argv[]) {
 
     read_file(fp);
     
-    /*print_symbol_table();*/
     print_topo_order(); 
-
 
     fclose(fp);
     free(symbols);
@@ -67,8 +65,6 @@ bool print_topo_order(void) {
     printf("\n");
 }
 
-// Frees the sorted Symbol list as well as the associated symbols in the symbol
-// table
 void destroy_sorted_symbols(void) {
     sortedSymbol* ssym = sortedSyms->first;
     while (ssym != NULL) {
@@ -79,11 +75,6 @@ void destroy_sorted_symbols(void) {
     }
     sortedSyms->size = 0;
     sortedSyms->first = NULL;
-}
-
-void remove_sorted_symbol() {
-
-
 }
 
 void remove_symbol(symbol* sym) {
@@ -124,9 +115,6 @@ void destroy_symbols_after(symbolsAfter* symbolsAfter) {
         free(symbolsAfter);
     }
 }
-
-
-// TODO clean lists that frees sortedSymbol list and symbolTable
 
 void print_symbol_table(void) {
     symbol* current;
@@ -363,6 +351,7 @@ bool read_next_symbol_pair (FILE* fp) {
 
     return true;
 }   
+
 void add_symbol_to_sorted(symbol* sym){
     sortedSymbol* symToAdd = init_sorted_symbol();
     symToAdd->sym = sym;
