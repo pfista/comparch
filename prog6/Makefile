@@ -5,7 +5,6 @@
 #CFLAGS = -O2 -Wall 
 CFLAGS = -O0 -ggdb3
 
-
 all:   cachesim
 
 cachesim: cds.o main.o read_cds.o simulate.o utils.o

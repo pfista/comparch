@@ -167,7 +167,7 @@ int Replacement_policy(CDS *cds, int first_index, int set_size)
 
     if (debug) fprintf(debug_file, "%s: look for victim in %d lines starting at %d\n", cds->name,  set_size, first_index);
     /* first look to see if any entry is empty */
-    for (i = 1; i < set_size; i++)
+    for (i = 0; i < set_size; i++)
         {
             if (!(cds->c[first_index+i].valid))
                 {
@@ -187,10 +187,10 @@ int Replacement_policy(CDS *cds, int first_index, int set_size)
                       choose the smallest */
             {
                 int min = cds->c[first_index].replacement_data;
-                if (debug) fprintf(debug_file, "%s: replacement data: ", cds->name);
+                if (debug) fprintf(debug_file, "%s: replacement data: [%d]: %d", cds->name, victim, min);
                 for (i = 1; i < set_size; i++)
                     {
-                        if (debug) fprintf(debug_file, "[%d]: %d, ", first_index+i, cds->c[first_index+i].replacement_data);
+                        if (debug) fprintf(debug_file, ", [%d]: %d", first_index+i, cds->c[first_index+i].replacement_data);
                         if (cds->c[first_index+i].replacement_data < min)
                             {
                                 victim = first_index+i;
@@ -280,23 +280,24 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     int sets_bits = which_power(number_of_sets);
     memory_address sets_bits_mask = mask_of(sets_bits);
     int cache_set_index = (cache_address >> number_of_low_order_bits) & sets_bits_mask;
+    int cache_entry_index = cache_set_index * cds->number_of_ways;
     
     /* index into cache table and search the number of ways to
        try to find cache line. */
     int i;
     for (i = 0; i < cds->number_of_ways; i++)
         {
-            if (cds->c[cache_set_index+i].valid && (cache_address == cds->c[cache_set_index+i].tag))
+            if (cds->c[cache_entry_index+i].valid && (cache_address == cds->c[cache_entry_index+i].tag))
                 {
                     /* found it -- record cache hit and exit */
                     if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
-                                       reference->address, cache_set_index+i);
+                                       reference->address, cache_entry_index+i);
                     cds->number_cache_hits += 1;
 
                     /* update reference specific info */
                     if (reference->type == MAT_STORE) 
-                        cds->c[cache_set_index+i].dirty = TRUE;
-                    Update_Replacement_Policy_Data(cds, cache_set_index, i);
+                        cds->c[cache_entry_index+i].dirty = TRUE;
+                    Update_Replacement_Policy_Data(cds, cache_entry_index, i);
                     return;
                 }
         }
@@ -305,7 +306,7 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     cds->number_cache_misses += 1;    
 
     /* Choose a victim from the set */
-    int victim = Replacement_policy(cds, cache_set_index, cds->number_of_ways);
+    int victim = Replacement_policy(cds, cache_entry_index, cds->number_of_ways);
     if (debug) fprintf(debug_file, "%s: Pick victim %d to replace\n", cds->name,  victim);
     
     /* evict victim */
@@ -324,7 +325,7 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     cds->c[victim].dirty = (reference->type == MAT_STORE);
     if (debug) fprintf(debug_file, "%s: Read cache line 0x%08X into entry %d\n", cds->name,  cds->c[victim].tag, victim);
 
-    Set_Replacement_Policy_Data(cds, cache_set_index, victim-cache_set_index);
+    Set_Replacement_Policy_Data(cds, cache_entry_index, victim-cache_entry_index);
 
     /* read cache line from memory into cache table */
     cds->number_memory_reads += 1;
