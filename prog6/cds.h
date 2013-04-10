@@ -15,7 +15,7 @@ enum CRP
     CRP_FIFO,
     CRP_LFU,
     CRP_RANDOM,
-    CRP_LRU // TODO
+    CRP_LRU
 };
 
 

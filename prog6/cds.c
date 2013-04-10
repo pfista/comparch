@@ -62,7 +62,8 @@ String CRP_name(CDS *cds)
                 sprintf(buffer, "LFU (decay=%d)", cds->LFU_Decay_Interval);
                 return(buffer);
             }
-
+        
+        case CRP_LRU: return("LRU");
         };
     return("Invalid policy");
 }

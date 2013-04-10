@@ -214,6 +214,11 @@ void define_key_value_pair(CDS *cds, Token *key, Token *value)
                     cds->replacement_policy = CRP_LFU;
                     return;
                 }
+            if (strcasestr(value->string, "LRU") != NULL)
+                {
+                    cds->replacement_policy = CRP_LRU;
+                    return;
+                }
             if (strcasestr(value->string, "random") != NULL)
                 {
                     cds->replacement_policy = CRP_RANDOM;

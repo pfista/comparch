@@ -23,6 +23,8 @@ typedef struct memory_reference memory_reference;
 
 static int trace_line_number;
 
+static int access_time;
+
 
 
 /* ***************************************************************** */
@@ -182,6 +184,9 @@ int Replacement_policy(CDS *cds, int first_index, int set_size)
         {
         case CRP_FIFO:  /* replacement data is the order we were brought in: 1, 2, 3, ... */
                     /* choose the smallest */
+
+        case CRP_LRU: /* replacement data is a counter where the smallest number is */
+                    /* the least recently used, choose smallest */
             
         case CRP_LFU:  /* replacement data is the number of uses, so
                       choose the smallest */
@@ -204,6 +209,7 @@ int Replacement_policy(CDS *cds, int first_index, int set_size)
         case CRP_RANDOM:  
             victim = first_index + (random() % set_size);
             break;
+
         }
 
     if (debug) fprintf(debug_file, "%s: found victim in entry %d\n", cds->name,  victim);
@@ -224,6 +230,11 @@ void Set_Replacement_Policy_Data(CDS *cds, int first_index, int i)
             
         case CRP_RANDOM:  
             break;
+
+        case CRP_LRU: /* replacement data is based on a time counter that increments
+                         read or write */
+            cds->c[first_index+i].replacement_data = access_time;
+            break;
         }
 }
 
@@ -239,6 +250,10 @@ void Update_Replacement_Policy_Data(CDS *cds, int first_index, int i)
             Check_For_Decay(cds);
             
         case CRP_RANDOM:  
+            break;
+
+        case CRP_LRU:
+            cds->c[first_index+i].replacement_data = access_time;
             break;
         }
 }
@@ -265,6 +280,8 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     if (debug) fprintf(debug_file, "%s: Reference 0x%08X of length %d\n",
                        cds->name, reference->address, reference->length);
 
+    //TODO
+    access_time++;
     /* find cache line for this reference */
     /* find number of low-order bits to mask off to find beginning cache
        line address */
@@ -326,6 +343,8 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     if (debug) fprintf(debug_file, "%s: Read cache line 0x%08X into entry %d\n", cds->name,  cds->c[victim].tag, victim);
 
     Set_Replacement_Policy_Data(cds, cache_entry_index, victim-cache_entry_index);
+
+    //TODO update global timer
 
     /* read cache line from memory into cache table */
     cds->number_memory_reads += 1;
