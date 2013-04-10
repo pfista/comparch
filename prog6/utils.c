@@ -22,12 +22,23 @@ int which_power(int n)
 {
     int i = 0;
     int t = 1;
+    // From John Owens
+    static const unsigned int b[] = { 0xAAAAAAAA, 0xCCCCCCCC, 0xF0F0F0F0,
+                                        0xFF00FF00, 0xFFFF0000 };
+    register unsigned int r = ( n & b[0] ) != 0;
+
+    for (i = 4; i > 0; i--) {
+        r |= ((n & b[i]) != 0) << i;
+    }
+    return (r);
+    /*
     while (n > t)
         {
             t += t;
             i += 1;
         }
     return(i);
+    */
 }
 
 /* generate a mask of n low order bits */

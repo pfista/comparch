@@ -3,7 +3,7 @@
 #
 # Use compiler optimization to make it run faster
 #CFLAGS = -O2 -Wall 
-CFLAGS = -O0 -ggdb3
+CFLAGS = -O0 -pg -ggdb3
 
 all:   cachesim
 
