@@ -1,0 +1,345 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 78.03    138.05   138.05 336891050     0.00     0.00  Simulate_Reference_to_Cache_Line
+ 10.87    157.29    19.24 1678734285     0.00     0.00  which_power
+  2.88    162.38     5.09 1004952185     0.00     0.00  Base_Cache_Address
+  1.35    164.77     2.39 1341843235     0.00     0.00  mask_of
+  1.28    167.04     2.27 331170085     0.00     0.00  Simulate_Reference_to_Memory
+  1.15    169.08     2.04 66234017     0.00     0.00  read_reference
+  0.95    170.75     1.68 620471601     0.00     0.00  ishex
+  0.94    172.41     1.66 336618738     0.00     0.00  Update_Replacement_Policy_Data
+  0.74    173.71     1.30        1     1.30   176.73  Simulate_Caches
+  0.47    174.54     0.83 66234153     0.00     0.00  skip_blanks
+  0.46    175.36     0.82 554237584     0.00     0.00  hexvalue
+  0.44    176.14     0.78 66234018     0.00     0.00  Read_trace_file_line
+  0.27    176.62     0.48 67378210     0.00     0.00  Check_For_Decay
+  0.12    176.83     0.22                             _GLOBAL__sub_I_65535_0_read_reference
+  0.05    176.91     0.08 66248674     0.00     0.00  decvalue
+  0.02    176.95     0.04                             _GLOBAL__sub_I_65535_0_new_token
+  0.02    176.98     0.03   272312     0.00     0.00  Set_Replacement_Policy_Data
+  0.01    177.00     0.02       10     0.00     0.00  remember_string
+  0.00    177.00     0.00   272312     0.00     0.00  Replacement_policy
+  0.00    177.00     0.00      508     0.00     0.00  put_char_in_token_at
+  0.00    177.00     0.00       50     0.00     0.00  get_token
+  0.00    177.00     0.00       30     0.00     0.00  get_key_value_pair
+  0.00    177.00     0.00       25     0.00     0.00  define_key_value_pair
+  0.00    177.00     0.00       15     0.00     0.00  memory_reference_type_name
+  0.00    177.00     0.00       10     0.00     0.00  delete_token
+  0.00    177.00     0.00       10     0.00     0.00  new_token
+  0.00    177.00     0.00        6     0.00     0.00  Read_CDS_file_entry
+  0.00    177.00     0.00        5     0.00     0.00  CRP_name
+  0.00    177.00     0.00        5     0.00     0.00  Print_Cache_Statistics_for_one_cache
+  0.00    177.00     0.00        5     0.00     0.00  delete_cache
+  0.00    177.00     0.00        5     0.00     0.00  init_cache
+  0.00    177.00     0.00        5     0.00     0.00  init_cache_for_trace
+  0.00    177.00     0.00        5     0.00     0.00  print_sets_and_ways
+  0.00    177.00     0.00        1     0.00     0.00  Delete_Caches
+  0.00    177.00     0.00        1     0.00     0.00  Init_Caches
+  0.00    177.00     0.00        1     0.00     0.00  Init_caches_for_trace
+  0.00    177.00     0.00        1     0.00     0.00  Print_Cache_Statistics
+  0.00    177.00     0.00        1     0.00     0.02  Read_Cache_Descriptions
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+ 
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this 
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.01% of 177.00 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     99.9    0.00  176.74                 main [1]
+                1.30  175.43       1/1           Simulate_Caches [2]
+                0.00    0.02       1/1           Read_Cache_Descriptions [20]
+                0.00    0.00       1/1           Init_Caches [37]
+                0.00    0.00       1/1           Print_Cache_Statistics [39]
+                0.00    0.00       1/1           Delete_Caches [36]
+-----------------------------------------------
+                1.30  175.43       1/1           main [1]
+[2]     99.8    1.30  175.43       1         Simulate_Caches [2]
+                2.27  166.93 331170085/331170085     Simulate_Reference_to_Memory [3]
+                0.78    5.45 66234018/66234018     Read_trace_file_line [7]
+                0.00    0.00       1/1           Init_caches_for_trace [38]
+-----------------------------------------------
+                2.27  166.93 331170085/331170085     Simulate_Caches [2]
+[3]     95.6    2.27  166.93 331170085         Simulate_Reference_to_Memory [3]
+              138.05   16.65 336891050/336891050     Simulate_Reference_to_Cache_Line [4]
+                3.38    8.84 668061135/1004952185     Base_Cache_Address [6]
+-----------------------------------------------
+              138.05   16.65 336891050/336891050     Simulate_Reference_to_Memory [3]
+[4]     87.4  138.05   16.65 336891050         Simulate_Reference_to_Cache_Line [4]
+                7.72    0.00 673782100/1678734285     which_power [5]
+                1.71    4.46 336891050/1004952185     Base_Cache_Address [6]
+                1.66    0.48 336618738/336618738     Update_Replacement_Policy_Data [10]
+                0.60    0.00 336891050/1341843235     mask_of [9]
+                0.03    0.00  272312/272312      Set_Replacement_Policy_Data [18]
+                0.00    0.00  272312/272312      Replacement_policy [25]
+-----------------------------------------------
+                7.72    0.00 673782100/1678734285     Simulate_Reference_to_Cache_Line [4]
+               11.52    0.00 1004952185/1678734285     Base_Cache_Address [6]
+[5]     10.9   19.24    0.00 1678734285         which_power [5]
+-----------------------------------------------
+                1.71    4.46 336891050/1004952185     Simulate_Reference_to_Cache_Line [4]
+                3.38    8.84 668061135/1004952185     Simulate_Reference_to_Memory [3]
+[6]     10.4    5.09   13.30 1004952185         Base_Cache_Address [6]
+               11.52    0.00 1004952185/1678734285     which_power [5]
+                1.79    0.00 1004952185/1341843235     mask_of [9]
+-----------------------------------------------
+                0.78    5.45 66234018/66234018     Simulate_Caches [2]
+[7]      3.5    0.78    5.45 66234018         Read_trace_file_line [7]
+                2.04    3.41 66234017/66234017     read_reference [8]
+-----------------------------------------------
+                2.04    3.41 66234017/66234017     Read_trace_file_line [7]
+[8]      3.1    2.04    3.41 66234017         read_reference [8]
+                1.68    0.00 620471601/620471601     ishex [11]
+                0.83    0.00 66234017/66234153     skip_blanks [12]
+                0.82    0.00 554237584/554237584     hexvalue [13]
+                0.08    0.00 66248674/66248674     decvalue [16]
+-----------------------------------------------
+                0.60    0.00 336891050/1341843235     Simulate_Reference_to_Cache_Line [4]
+                1.79    0.00 1004952185/1341843235     Base_Cache_Address [6]
+[9]      1.3    2.39    0.00 1341843235         mask_of [9]
+-----------------------------------------------
+                1.66    0.48 336618738/336618738     Simulate_Reference_to_Cache_Line [4]
+[10]     1.2    1.66    0.48 336618738         Update_Replacement_Policy_Data [10]
+                0.48    0.00 67374750/67378210     Check_For_Decay [14]
+-----------------------------------------------
+                1.68    0.00 620471601/620471601     read_reference [8]
+[11]     0.9    1.68    0.00 620471601         ishex [11]
+-----------------------------------------------
+                0.00    0.00       6/66234153     Read_CDS_file_entry [19]
+                0.00    0.00      50/66234153     get_token [24]
+                0.00    0.00      80/66234153     get_key_value_pair [23]
+                0.83    0.00 66234017/66234153     read_reference [8]
+[12]     0.5    0.83    0.00 66234153         skip_blanks [12]
+-----------------------------------------------
+                0.82    0.00 554237584/554237584     read_reference [8]
+[13]     0.5    0.82    0.00 554237584         hexvalue [13]
+-----------------------------------------------
+                0.00    0.00    3460/67378210     Set_Replacement_Policy_Data [18]
+                0.48    0.00 67374750/67378210     Update_Replacement_Policy_Data [10]
+[14]     0.3    0.48    0.00 67378210         Check_For_Decay [14]
+-----------------------------------------------
+                                                 <spontaneous>
+[15]     0.1    0.22    0.00                 _GLOBAL__sub_I_65535_0_read_reference [15]
+-----------------------------------------------
+                0.08    0.00 66248674/66248674     read_reference [8]
+[16]     0.0    0.08    0.00 66248674         decvalue [16]
+-----------------------------------------------
+                                                 <spontaneous>
+[17]     0.0    0.04    0.00                 _GLOBAL__sub_I_65535_0_new_token [17]
+-----------------------------------------------
+                0.03    0.00  272312/272312      Simulate_Reference_to_Cache_Line [4]
+[18]     0.0    0.03    0.00  272312         Set_Replacement_Policy_Data [18]
+                0.00    0.00    3460/67378210     Check_For_Decay [14]
+-----------------------------------------------
+                0.00    0.02       6/6           Read_Cache_Descriptions [20]
+[19]     0.0    0.00    0.02       6         Read_CDS_file_entry [19]
+                0.00    0.01      25/25          define_key_value_pair [22]
+                0.01    0.00       5/10          remember_string [21]
+                0.00    0.00      30/30          get_key_value_pair [23]
+                0.00    0.00       6/66234153     skip_blanks [12]
+                0.00    0.00      10/10          new_token [29]
+                0.00    0.00      10/10          delete_token [28]
+-----------------------------------------------
+                0.00    0.02       1/1           main [1]
+[20]     0.0    0.00    0.02       1         Read_Cache_Descriptions [20]
+                0.00    0.02       6/6           Read_CDS_file_entry [19]
+-----------------------------------------------
+                0.01    0.00       5/10          define_key_value_pair [22]
+                0.01    0.00       5/10          Read_CDS_file_entry [19]
+[21]     0.0    0.02    0.00      10         remember_string [21]
+-----------------------------------------------
+                0.00    0.01      25/25          Read_CDS_file_entry [19]
+[22]     0.0    0.00    0.01      25         define_key_value_pair [22]
+                0.01    0.00       5/10          remember_string [21]
+-----------------------------------------------
+                0.00    0.00      30/30          Read_CDS_file_entry [19]
+[23]     0.0    0.00    0.00      30         get_key_value_pair [23]
+                0.00    0.00      80/66234153     skip_blanks [12]
+                0.00    0.00      50/50          get_token [24]
+-----------------------------------------------
+                0.00    0.00      50/50          get_key_value_pair [23]
+[24]     0.0    0.00    0.00      50         get_token [24]
+                0.00    0.00      50/66234153     skip_blanks [12]
+                0.00    0.00     508/508         put_char_in_token_at [26]
+-----------------------------------------------
+                0.00    0.00  272312/272312      Simulate_Reference_to_Cache_Line [4]
+[25]     0.0    0.00    0.00  272312         Replacement_policy [25]
+-----------------------------------------------
+                0.00    0.00     508/508         get_token [24]
+[26]     0.0    0.00    0.00     508         put_char_in_token_at [26]
+-----------------------------------------------
+                0.00    0.00      15/15          Print_Cache_Statistics_for_one_cache [31]
+[27]     0.0    0.00    0.00      15         memory_reference_type_name [27]
+-----------------------------------------------
+                0.00    0.00      10/10          Read_CDS_file_entry [19]
+[28]     0.0    0.00    0.00      10         delete_token [28]
+-----------------------------------------------
+                0.00    0.00      10/10          Read_CDS_file_entry [19]
+[29]     0.0    0.00    0.00      10         new_token [29]
+-----------------------------------------------
+                0.00    0.00       5/5           Print_Cache_Statistics_for_one_cache [31]
+[30]     0.0    0.00    0.00       5         CRP_name [30]
+-----------------------------------------------
+                0.00    0.00       5/5           Print_Cache_Statistics [39]
+[31]     0.0    0.00    0.00       5         Print_Cache_Statistics_for_one_cache [31]
+                0.00    0.00      15/15          memory_reference_type_name [27]
+                0.00    0.00       5/5           CRP_name [30]
+                0.00    0.00       5/5           print_sets_and_ways [35]
+-----------------------------------------------
+                0.00    0.00       5/5           Delete_Caches [36]
+[32]     0.0    0.00    0.00       5         delete_cache [32]
+-----------------------------------------------
+                0.00    0.00       5/5           Init_Caches [37]
+[33]     0.0    0.00    0.00       5         init_cache [33]
+-----------------------------------------------
+                0.00    0.00       5/5           Init_caches_for_trace [38]
+[34]     0.0    0.00    0.00       5         init_cache_for_trace [34]
+-----------------------------------------------
+                0.00    0.00       5/5           Print_Cache_Statistics_for_one_cache [31]
+[35]     0.0    0.00    0.00       5         print_sets_and_ways [35]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[36]     0.0    0.00    0.00       1         Delete_Caches [36]
+                0.00    0.00       5/5           delete_cache [32]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[37]     0.0    0.00    0.00       1         Init_Caches [37]
+                0.00    0.00       5/5           init_cache [33]
+-----------------------------------------------
+                0.00    0.00       1/1           Simulate_Caches [2]
+[38]     0.0    0.00    0.00       1         Init_caches_for_trace [38]
+                0.00    0.00       5/5           init_cache_for_trace [34]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[39]     0.0    0.00    0.00       1         Print_Cache_Statistics [39]
+                0.00    0.00       5/5           Print_Cache_Statistics_for_one_cache [31]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+
+Index by function name
+
+   [6] Base_Cache_Address      [2] Simulate_Caches        [33] init_cache
+  [30] CRP_name                [4] Simulate_Reference_to_Cache_Line [34] init_cache_for_trace
+  [14] Check_For_Decay         [3] Simulate_Reference_to_Memory [11] ishex
+  [36] Delete_Caches          [10] Update_Replacement_Policy_Data [9] mask_of
+  [37] Init_Caches            [17] _GLOBAL__sub_I_65535_0_new_token (read_cds.c) [27] memory_reference_type_name
+  [38] Init_caches_for_trace  [15] _GLOBAL__sub_I_65535_0_read_reference (simulate.c) [29] new_token
+  [39] Print_Cache_Statistics [16] decvalue               [35] print_sets_and_ways
+  [31] Print_Cache_Statistics_for_one_cache [22] define_key_value_pair [26] put_char_in_token_at
+  [19] Read_CDS_file_entry    [32] delete_cache            [8] read_reference
+  [20] Read_Cache_Descriptions [28] delete_token          [21] remember_string
+   [7] Read_trace_file_line   [23] get_key_value_pair     [12] skip_blanks
+  [25] Replacement_policy     [24] get_token               [5] which_power
+  [18] Set_Replacement_Policy_Data [13] hexvalue

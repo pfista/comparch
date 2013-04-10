@@ -3,9 +3,9 @@
 #
 # Use compiler optimization to make it run faster
 #CFLAGS = -O2 -Wall 
-CFLAGS = -O0 -ggdb3
-# GCOV
-#CFLAGS = -O0 -fprofile-arcs -ftest-coverage -ggdb3
+#CFLAGS = -O0 -ggdb3
+# GCOV / GPROF
+CFLAGS = -O0 -fprofile-arcs -ftest-coverage -ggdb3
 
 all:   cachesim
 
