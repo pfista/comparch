@@ -150,7 +150,8 @@ void Check_For_Decay(CDS *cds)
         {
             int i;
             if (debug) fprintf(debug_file, "%s: LFU decay for all LFU counters\n", cds->name);
-            for (i = 0; i < cds->number_of_cache_entries; i++)
+            int limit = cds->number_of_cache_entries; // Code motion, reduce procedure calls
+            for (i = 0; i < limit; i++)
                 {
                     cds->c[i].replacement_data = cds->c[i].replacement_data/2;
                 }
@@ -302,7 +303,8 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     /* index into cache table and search the number of ways to
        try to find cache line. */
     int i;
-    for (i = 0; i < cds->number_of_ways; i++)
+    int limit = cds->number_of_ways; // code motion, Reduce procedure call
+    for (i = 0; i < limit; i++)
         {
             if (cds->c[cache_entry_index+i].valid && (cache_address == cds->c[cache_entry_index+i].tag))
                 {
