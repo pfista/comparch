@@ -281,8 +281,8 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     if (debug) fprintf(debug_file, "%s: Reference 0x%08X of length %d\n",
                        cds->name, reference->address, reference->length);
 
-    //TODO
-    access_time++;
+    access_time++; /*for use with LRU */
+
     /* find cache line for this reference */
     /* find number of low-order bits to mask off to find beginning cache
        line address */

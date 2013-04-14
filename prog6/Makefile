@@ -2,12 +2,12 @@
 #   Makefile for building the cache simulator
 #
 # Use compiler optimization to make it run faster
-CFLAGS = -O2 -pg -Wall 
+#CFLAGS = -O2 -Wall 
 #CFLAGS = -O0 -Wall
 #CFLAGS = -O0 -ggdb3
 # GCOV / GPROF
 #CFLAGS = -O0 -fprofile-arcs -ftest-coverage -ggdb3
-#CFLAGS = -O0 -pg -ggdb3
+CFLAGS = -O0 -pg -ggdb3
 
 all:   cachesim
 
