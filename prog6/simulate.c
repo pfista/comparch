@@ -302,42 +302,42 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     int cache_set_index = (cache_address >> number_of_low_order_bits) & sets_bits_mask;
     int cache_entry_index = cache_set_index * num_ways;
 
-    quicksort(cds->sorted_cache, 0, num_ways-1);
-
-    int victim_index = binary_search(cds->sorted_cache, 0, num_ways-1, cache_address);
-    if (victim_index != -1)
-    {
-        /* found it -- record cache hit and exit */
-        if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
-                           reference->address, victim_index);
-        cds->number_cache_hits += 1;
-
-        /* update reference specific info */
-        if (reference->type == MAT_STORE) 
-            cds->c[victim_index].dirty = TRUE; // TODO be careful with index here...?
-        Update_Replacement_Policy_Data(cds, cache_entry_index, victim_index-cache_entry_index);
-        return;
-    }
-    
-    /*
-    int i;
-    for (i = 0; i < num_ways; i++)
+    if (number_of_sets == 1) {
+        quicksort(cds->sorted_cache, 0, num_ways-1);
+        int victim_index = binary_search(cds->sorted_cache, 0, num_ways-1, cache_address);
+        if (victim_index != -1)
         {
-            if (cds->c[cache_entry_index+i].valid && (cache_address == cds->c[cache_entry_index+i].tag))
-                {
-                    // found it -- record cache hit and exit
-                    if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
-                                       reference->address, cache_entry_index+i);
-                    cds->number_cache_hits += 1;
-
-                    // update reference specific info
-                    if (reference->type == MAT_STORE) 
-                        cds->c[cache_entry_index+i].dirty = TRUE;
-                    Update_Replacement_Policy_Data(cds, cache_entry_index, i);
-                    return;
-                }
+            /* found it -- record cache hit and exit */
+            if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
+                               reference->address, victim_index);
+            cds->number_cache_hits += 1;
+            /* update reference specific info */
+            if (reference->type == MAT_STORE) 
+                cds->c[victim_index].dirty = TRUE; // TODO be careful with index here...?
+            Update_Replacement_Policy_Data(cds, cache_entry_index, victim_index-cache_entry_index);
+            return;
         }
-    */
+    }
+    else
+    {
+        int i;
+        for (i = 0; i < num_ways; i++)
+            {
+                if (cds->c[cache_entry_index+i].valid && (cache_address == cds->c[cache_entry_index+i].tag))
+                    {
+                        // found it -- record cache hit and exit
+                        if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
+                                           reference->address, cache_entry_index+i);
+                        cds->number_cache_hits += 1;
+
+                        // update reference specific info
+                        if (reference->type == MAT_STORE) 
+                            cds->c[cache_entry_index+i].dirty = TRUE;
+                        Update_Replacement_Policy_Data(cds, cache_entry_index, i);
+                        return;
+                    }
+            }
+    }
 
     /* Did not find it. */
     cds->number_cache_misses += 1;    

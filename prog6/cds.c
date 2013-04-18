@@ -133,16 +133,13 @@ void init_cache(CDS *cds)
 
     /* initializes the sorted cache with pointers to the normal cache */
     cds->sorted_cache = calloc(cds->number_of_cache_entries, sizeof(sorted_cache_set));
-    /*
     int i;
-    //TODO where do I update these values?
-    for (i = 0; i < num_ways; i++)
+    //TODO where do I update these values?, only use this when for full
+    for (i = 0; i < cds->number_of_cache_entries; i++)
     {
-        sorted_cache[i].original_index = i;
-        sorted_cache[i].tag = &(cds->c[i].tag);
+        cds->sorted_cache[i].original_index = i;
+        cds->sorted_cache[i].tag = &(cds->c[i].tag);
     }
-    */
-
 }
 
 

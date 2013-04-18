@@ -2,9 +2,9 @@
 #   Makefile for building the cache simulator
 #
 #CFLAGS = -O2 -Wall 
-CFLAGS = -O0 -ggdb3
+#CFLAGS = -O0 -ggdb3
 #CFLAGS = -O0 -fprofile-arcs -ftest-coverage -ggdb3
-#CFLAGS = -O2 -pg -ggdb3
+CFLAGS = -O2 -pg -ggdb3
 
 all:   cachesim
 
