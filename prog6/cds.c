@@ -17,12 +17,14 @@
 
 String print_sets_and_ways(CDS *cds)
 {
-    if (cds->number_of_ways == 1) return("direct-mapped");
-    if (cds->number_of_ways == cds->number_of_cache_entries) return("fully associative");
+    int num_ways = cds->number_of_ways;
+    int num_cache_entries = cds->number_of_cache_entries;
+    if (num_ways == 1) return("direct-mapped");
+    if (num_ways == num_cache_entries) return("fully associative");
 
     static char buffer[64];
     sprintf (buffer, "%d sets of %d ways", 
-             cds->number_of_cache_entries/cds->number_of_ways, cds->number_of_ways);
+             num_cache_entries/num_ways, num_ways);
     return(buffer);
 }
 
@@ -128,6 +130,8 @@ void init_cache(CDS *cds)
 {
     /* we need one cache line for every entry */
     cds->c = calloc(cds->number_of_cache_entries, sizeof(cache_line));
+    sorted_cache = NULL;
+
 }
 
 

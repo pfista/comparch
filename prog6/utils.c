@@ -10,6 +10,8 @@
 #include "global.h"
 #include "utils.h"        // utility functions
 
+static char LogTable256[256];
+
 
 /* ***************************************************************** */
 /*                                                                   */
@@ -20,15 +22,44 @@
 /* 1 -> 0; 2 -> 1; 4->2... */
 int which_power(int n)
 {
-    int i = 0;
-    int t = 1;
-    while (n > t)
-        {
-            t += t;
-            i += 1;
-        }
-    return(i);
+    /* This optimization is from
+     * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogLookup
+     * Generate a lookup table once before using 
+     */
+    unsigned r; // r will be lg(n)
+    unsigned int t; // temp
+
+    if ((t = n >> 24)) 
+    {
+      r = 24 + LogTable256[t];
+    } 
+    else if ((t = n >> 16)) 
+    {
+      r = 16 + LogTable256[t];
+    } 
+    else if ((t = n >> 8)) 
+    {
+      r = 8 + LogTable256[t];
+    } 
+    else 
+    {
+      r = LogTable256[n];
+    }
+
+    return r;
 }
+
+void init_lut(void) {
+    LogTable256[0] = LogTable256[1] = 0;
+    int i;
+    for (i = 2; i < 256; i++) 
+    {
+      LogTable256[i] = 1 + LogTable256[i / 2];
+    }
+    LogTable256[0] = -1; // if you want log(0) to return -1
+}
+
+
 
 /* generate a mask of n low order bits */
 /* if we want a mask of two bits, shift a 1 two
@@ -112,4 +143,51 @@ int skip_line(FILE *file)
     return(c);
 }
 
+int binary_search(sorted_cache_set* array, int low, int high, int target_tag)
+{
+    while (low <= high)
+    {
+        int middle = low + (high - low)/2;
+        if (target_tag < *array[middle].tag)
+            high = middle-1;
+        else if (target_tag > *array[middle].tag)
+            low = middle+1;
+        else return array[middle].original_index;
+    }
+    return -1;
+}
 
+void quicksort (sorted_cache_set* array, int low, int high) 
+{
+    int left = low, right = high;
+    sorted_cache_set temp;
+
+    if (array == NULL)
+        printf("NULL POINTER");
+
+    int pivot = *(array[(low+high)/2].tag); // just use the mid point for the pivot
+
+    while (left <= right)
+    {
+        /* move high and low to the values that need to be switched */
+        while (*array[left].tag < pivot)
+            left++;
+        while (*array[right].tag > pivot)
+            right--;
+
+        if (left <= right)
+        {
+            /* swap the two values around the pivot */
+            temp = array[left];
+            array[left] = array[right];
+            array[right] = temp;
+            left++;
+            right--;
+        }
+    }
+
+    if (low < right)
+        quicksort(array, low, right);
+    if (left < high)
+        quicksort(array, left, high);
+}

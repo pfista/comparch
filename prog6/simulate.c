@@ -23,6 +23,7 @@ typedef struct memory_reference memory_reference;
 
 static int trace_line_number;
 
+/* used for LRU */
 static int access_time;
 
 
@@ -276,57 +277,84 @@ memory_address Base_Cache_Address(CDS *cds, memory_address a)
 }
 
 
+//TODO !!!!!!!!!!!!! SPPEEEEEEED
 void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
 {
     if (debug) fprintf(debug_file, "%s: Reference 0x%08X of length %d\n",
                        cds->name, reference->address, reference->length);
 
-    // TODO might need to make this a local static??
     access_time++; /*for use with LRU */
 
     /* find cache line for this reference */
     /* find number of low-order bits to mask off to find beginning cache
        line address */
-    
     memory_address cache_address = Base_Cache_Address(cds, reference->address);
 
     /* shift off low-order offset bits and find bits for 
        indexing into cache table */
     /* the number of sets is the number of cache entries
        divided by the number of ways. */
+    int num_ways = cds->number_of_ways;
     int number_of_low_order_bits = which_power(cds->cache_line_size);
-    int number_of_sets = cds->number_of_cache_entries/cds->number_of_ways;
+    int number_of_sets = cds->number_of_cache_entries/num_ways;
     int sets_bits = which_power(number_of_sets);
     memory_address sets_bits_mask = mask_of(sets_bits);
     int cache_set_index = (cache_address >> number_of_low_order_bits) & sets_bits_mask;
-    int cache_entry_index = cache_set_index * cds->number_of_ways;
+    int cache_entry_index = cache_set_index * num_ways;
+
+    /* initializes the sorted cache with pointers to the normal cache */
+    if (sorted_cache == NULL) {
+        sorted_cache = malloc(sizeof(sorted_cache_set)*num_ways);
+        int i;
+        for (i = 0; i < num_ways; i++)
+        {
+            sorted_cache[i].original_index = cache_entry_index+i;
+            sorted_cache[i].tag = &cds->c[cache_entry_index+i].tag;
+        }
+    }
+
+    quicksort(sorted_cache, 0, num_ways);
+
+    int victim_index = binary_search(sorted_cache, 0, num_ways, cache_address);
+    if (victim_index != -1)
+    {
+        /* found it -- record cache hit and exit */
+        if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
+                           reference->address, victim_index);
+        cds->number_cache_hits += 1;
+
+        /* update reference specific info */
+        if (reference->type == MAT_STORE) 
+            cds->c[victim_index].dirty = TRUE; // TODO be careful with index here...?
+        Update_Replacement_Policy_Data(cds, cache_entry_index, victim_index-cache_entry_index);
+        return;
+    }
     
-    /* index into cache table and search the number of ways to
-       try to find cache line. */
+    /*
     int i;
-    int limit = cds->number_of_ways; // code motion, Reduce procedure call
-    for (i = 0; i < limit; i++)
+    for (i = 0; i < num_ways; i++)
         {
             if (cds->c[cache_entry_index+i].valid && (cache_address == cds->c[cache_entry_index+i].tag))
                 {
-                    /* found it -- record cache hit and exit */
+                    // found it -- record cache hit and exit
                     if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
                                        reference->address, cache_entry_index+i);
                     cds->number_cache_hits += 1;
 
-                    /* update reference specific info */
+                    // update reference specific info
                     if (reference->type == MAT_STORE) 
                         cds->c[cache_entry_index+i].dirty = TRUE;
                     Update_Replacement_Policy_Data(cds, cache_entry_index, i);
                     return;
                 }
         }
+    */
 
     /* Did not find it. */
     cds->number_cache_misses += 1;    
 
     /* Choose a victim from the set */
-    int victim = Replacement_policy(cds, cache_entry_index, cds->number_of_ways);
+    int victim = Replacement_policy(cds, cache_entry_index, num_ways);
     if (debug) fprintf(debug_file, "%s: Pick victim %d to replace\n", cds->name,  victim);
     
     /* evict victim */
@@ -345,9 +373,9 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     cds->c[victim].dirty = (reference->type == MAT_STORE);
     if (debug) fprintf(debug_file, "%s: Read cache line 0x%08X into entry %d\n", cds->name,  cds->c[victim].tag, victim);
 
+
     Set_Replacement_Policy_Data(cds, cache_entry_index, victim-cache_entry_index);
 
-    //TODO update global timer
 
     /* read cache line from memory into cache table */
     cds->number_memory_reads += 1;
@@ -366,8 +394,10 @@ void Simulate_Reference_to_Memory(CDS *cds, memory_reference *reference)
     cds->number_of_memory_reference += 1;
     cds->number_of_type[reference->type] += 1;
 
+    memory_address ref_address = reference->address;
+
     /* check if the entire reference fits into just one cache line */
-    if (Base_Cache_Address(cds, reference->address) == Base_Cache_Address(cds, reference->address + reference->length -1))
+    if (Base_Cache_Address(cds, ref_address) == Base_Cache_Address(cds, ref_address + reference->length -1))
         {
             Simulate_Reference_to_Cache_Line(cds, reference);
         }
@@ -379,11 +409,11 @@ void Simulate_Reference_to_Memory(CDS *cds, memory_reference *reference)
             memory_reference reference2;
             /* easiest to compute the second part first */
             reference2.type = reference->type;
-            reference2.address = Base_Cache_Address(cds, reference->address + reference->length -1);
-            reference2.length = reference->address + reference->length - reference2.address;
+            reference2.address = Base_Cache_Address(cds, ref_address + reference->length -1);
+            reference2.length = ref_address + reference->length - reference2.address;
 
             reference1.type = reference->type;
-            reference1.address = reference->address;
+            reference1.address = ref_address;
             reference1.length = reference->length - reference2.length;
 
             /* but we do the references first, then second */
@@ -407,6 +437,9 @@ void Simulate_Caches(String trace_file_name)
 {
     FILE *trace_file;
     memory_reference reference;
+
+    /* generates a lookup table for fast log2(x) calc */
+    init_lut();
 
     /* open input file */
     trace_file = fopen(trace_file_name, "r");
