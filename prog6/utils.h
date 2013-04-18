@@ -5,6 +5,7 @@
 /* ***************************************************************** */
 
 #include "global.h"
+#include "cds.h"
 
 String remember_string(const String name);
 

@@ -130,7 +130,18 @@ void init_cache(CDS *cds)
 {
     /* we need one cache line for every entry */
     cds->c = calloc(cds->number_of_cache_entries, sizeof(cache_line));
-    sorted_cache = NULL;
+
+    /* initializes the sorted cache with pointers to the normal cache */
+    cds->sorted_cache = calloc(cds->number_of_cache_entries, sizeof(sorted_cache_set));
+    /*
+    int i;
+    //TODO where do I update these values?
+    for (i = 0; i < num_ways; i++)
+    {
+        sorted_cache[i].original_index = i;
+        sorted_cache[i].tag = &(cds->c[i].tag);
+    }
+    */
 
 }
 
@@ -156,7 +167,6 @@ void init_cache_for_trace(CDS *cds)
     int i;
     for (i = 0; i < NUMBER_OF_MEMORY_ACCESS_TYPE; i++) cds->number_of_type[i] = 0;
     cds->number_of_memory_reference = 0;
-
     cds->number_cache_hits = 0;
     cds->number_cache_misses = 0;
     cds->number_memory_reads = 0;
@@ -185,6 +195,7 @@ void delete_cache(CDS *cds)
 {
     /* we need one cache line for every entry */
     free(cds->c);
+    free(cds->sorted_cache);
     free(cds->name);
     free(cds);
 }

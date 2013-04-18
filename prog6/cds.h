@@ -63,6 +63,13 @@ struct cache_line
 };
 typedef struct cache_line cache_line;
 
+/* this is used to improve lookup speed for fully associative caches */
+struct sorted_cache_set{
+    int original_index;
+    memory_address* tag;
+};
+typedef struct sorted_cache_set sorted_cache_set;
+
 
 
 
@@ -88,6 +95,9 @@ struct CDS
 
     /* array of cache lines */
     cache_line *c;
+
+    /* sorted array of cache lines */
+    sorted_cache_set* sorted_cache;
 
     /* statistics for each cache policy */
     counter_t number_of_memory_reference;

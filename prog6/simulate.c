@@ -302,20 +302,9 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     int cache_set_index = (cache_address >> number_of_low_order_bits) & sets_bits_mask;
     int cache_entry_index = cache_set_index * num_ways;
 
-    /* initializes the sorted cache with pointers to the normal cache */
-    if (sorted_cache == NULL) {
-        sorted_cache = malloc(sizeof(sorted_cache_set)*num_ways);
-        int i;
-        for (i = 0; i < num_ways; i++)
-        {
-            sorted_cache[i].original_index = cache_entry_index+i;
-            sorted_cache[i].tag = &cds->c[cache_entry_index+i].tag;
-        }
-    }
+    quicksort(cds->sorted_cache, 0, num_ways-1);
 
-    quicksort(sorted_cache, 0, num_ways);
-
-    int victim_index = binary_search(sorted_cache, 0, num_ways, cache_address);
+    int victim_index = binary_search(cds->sorted_cache, 0, num_ways-1, cache_address);
     if (victim_index != -1)
     {
         /* found it -- record cache hit and exit */

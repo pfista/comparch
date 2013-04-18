@@ -31,17 +31,6 @@ typedef unsigned char byte;
 /* A memory address is a 32-bit integer */
 typedef int memory_address;
 
-
-/* this is used to improve lookup speed for fully associative caches */
-struct sorted_cache_set{
-    int original_index;
-    memory_address* tag;
-};
-typedef struct sorted_cache_set sorted_cache_set;
-
-/* sorted array of cache lines */
-sorted_cache_set* sorted_cache;
-
 enum memory_access_type  { MAT_LOAD, MAT_STORE, MAT_FETCH };
 #define NUMBER_OF_MEMORY_ACCESS_TYPE 3
 

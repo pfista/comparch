@@ -23,7 +23,7 @@ read_cds.o: read_cds.c global.h cds.h caches.h utils.h
 simulate.o: simulate.c global.h cds.h caches.h utils.h
 	gcc $(CFLAGS) simulate.c -c
 
-utils.o: utils.c global.h utils.h
+utils.o: utils.c global.h utils.h cds.h
 	gcc $(CFLAGS) utils.c -c
 
 clean: 

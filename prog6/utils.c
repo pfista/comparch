@@ -50,13 +50,14 @@ int which_power(int n)
 }
 
 void init_lut(void) {
-    LogTable256[0] = LogTable256[1] = 0;
+    LogTable256[0] = -1;
+    LogTable256[1] = 0;
+
     int i;
     for (i = 2; i < 256; i++) 
     {
       LogTable256[i] = 1 + LogTable256[i / 2];
     }
-    LogTable256[0] = -1; // if you want log(0) to return -1
 }
 
 
@@ -162,10 +163,8 @@ void quicksort (sorted_cache_set* array, int low, int high)
     int left = low, right = high;
     sorted_cache_set temp;
 
-    if (array == NULL)
-        printf("NULL POINTER");
-
-    int pivot = *(array[(low+high)/2].tag); // just use the mid point for the pivot
+    int middle = low + (high - low)/2;
+    int pivot = *(array[middle].tag); // just use the mid point for the pivot
 
     while (left <= right)
     {
