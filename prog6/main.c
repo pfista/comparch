@@ -14,6 +14,7 @@
 #include "caches.h"
 
 Boolean debug = FALSE;
+FILE *debug_file;
 
 
 /* ***************************************************************** */
