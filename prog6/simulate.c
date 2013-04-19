@@ -364,10 +364,6 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     // TODO this is where I update my sorted_cache
     // must quicksort here since the structure has changed now
     quicksort(cds->sorted_cache, 0, num_ways-1);
-    /* must find the index where victim exists... */
-    cds->sorted_cache[victim].tag = cache_address;
-    cds->sorted_cache[victim].original_index = victim; 
-
 
     Set_Replacement_Policy_Data(cds, cache_entry_index, victim-cache_entry_index);
 

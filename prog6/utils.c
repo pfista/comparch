@@ -149,9 +149,10 @@ int binary_search(sorted_cache_set* array, int low, int high, int target_tag)
     while (low <= high)
     {
         int middle = low + (high - low)/2;
-        if (target_tag < array[middle].tag)
+        int tag = *array[middle].tag;
+        if (target_tag < tag)
             high = middle-1;
-        else if (target_tag > array[middle].tag)
+        else if (target_tag > tag)
             low = middle+1;
         else return array[middle].original_index;
     }
@@ -164,14 +165,14 @@ void quicksort (sorted_cache_set* array, int low, int high)
     sorted_cache_set temp;
 
     int middle = low + (high - low)/2;
-    int pivot = array[middle].tag; // just use the mid point for the pivot
+    int pivot = *array[middle].tag; // just use the mid point for the pivot
 
     while (left <= right)
     {
         /* move high and low to the values that need to be switched */
-        while (array[left].tag < pivot)
+        while (*array[left].tag < pivot)
             left++;
-        while (array[right].tag > pivot)
+        while (*array[right].tag > pivot)
             right--;
 
         if (left <= right)

@@ -66,7 +66,7 @@ typedef struct cache_line cache_line;
 /* this is used to improve lookup speed for fully associative caches */
 struct sorted_cache_set{
     int original_index;
-    memory_address tag;
+    memory_address* tag;
 };
 typedef struct sorted_cache_set sorted_cache_set;
 
