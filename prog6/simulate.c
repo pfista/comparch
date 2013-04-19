@@ -362,6 +362,11 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     cds->c[victim].dirty = (reference->type == MAT_STORE);
     if (debug) fprintf(debug_file, "%s: Read cache line 0x%08X into entry %d\n", cds->name,  cds->c[victim].tag, victim);
 
+    // TODO this is where I update my sorted_cache
+    /* must find the index where victim exists... */
+    cds->sorted_cache[victim].tag = cache_address;
+    cds->sorted_cache[victim].original_index = victim; 
+
 
     Set_Replacement_Policy_Data(cds, cache_entry_index, victim-cache_entry_index);
 

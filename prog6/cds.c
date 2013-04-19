@@ -138,7 +138,7 @@ void init_cache(CDS *cds)
     for (i = 0; i < cds->number_of_cache_entries; i++)
     {
         cds->sorted_cache[i].original_index = i;
-        cds->sorted_cache[i].tag = &(cds->c[i].tag);
+        cds->sorted_cache[i].tag = cds->c[i].tag;
     }
 }
 
