@@ -302,21 +302,20 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
     int cache_set_index = (cache_address >> number_of_low_order_bits) & sets_bits_mask;
     int cache_entry_index = cache_set_index * num_ways;
 
-    if (number_of_sets == 1) {
-        int victim_index = binary_search(cds->sorted_cache, 0, num_ways-1, cache_address);
-        if (victim_index != -1)
-        {
-            /* found it -- record cache hit and exit */
-            if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
-                               reference->address, victim_index);
-            cds->number_cache_hits += 1;
-            /* update reference specific info */
-            if (reference->type == MAT_STORE) 
-                cds->c[victim_index].dirty = TRUE; // TODO be careful with index here...?
-            Update_Replacement_Policy_Data(cds, cache_entry_index, victim_index-cache_entry_index);
-            return;
-        }
+    int victim_index = binary_search(cds->sorted_cache, cache_entry_index, cache_entry_index+num_ways-1, cache_address);
+    if (victim_index != -1)
+    {
+        /* found it -- record cache hit and exit */
+        if (debug) fprintf(debug_file, "%s: Found address 0x%08X in cache line %d\n", cds->name, 
+                           reference->address, victim_index);
+        cds->number_cache_hits += 1;
+        /* update reference specific info */
+        if (reference->type == MAT_STORE) 
+            cds->c[victim_index].dirty = TRUE; // TODO be careful with index here...?
+        Update_Replacement_Policy_Data(cds, cache_entry_index, victim_index-cache_entry_index);
+        return;
     }
+    /*
     else
     {
         int i;
@@ -337,6 +336,7 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
                     }
             }
     }
+    */
 
     /* Did not find it. */
     cds->number_cache_misses += 1;    
@@ -363,7 +363,7 @@ void Simulate_Reference_to_Cache_Line(CDS *cds, memory_reference *reference)
 
     // TODO this is where I update my sorted_cache
     // must quicksort here since the structure has changed now
-    quicksort(cds->sorted_cache, 0, num_ways-1);
+    quicksort(cds->sorted_cache, cache_entry_index, cache_entry_index+num_ways-1);
 
     Set_Replacement_Policy_Data(cds, cache_entry_index, victim-cache_entry_index);
 
