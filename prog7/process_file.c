@@ -128,7 +128,9 @@ region* read_map_data (char* file_name)
 
                     if (polygon_index >= polygon_size) {
                         // Buffer is out of space, reallocate
-                        polygon* temp_polygons = realloc(regions[region_index].polygons, sizeof(polygon)*polygon_size*2);
+                        polygon* temp_polygons = realloc(regions[region_index].polygons,
+                                sizeof(polygon)*polygon_size*2);
+
                         if (temp_polygons == NULL){
                             fprintf(stderr, "Problem reallocing polygon buffer\n");
                             exit(EXIT_FAILURE);
@@ -139,7 +141,9 @@ region* read_map_data (char* file_name)
                         }
                     }
 
-                    regions[region_index].polygons[polygon_index].vertices = malloc(sizeof(point)*DEFAULT_NUM_POINTS);
+                    regions[region_index].polygons[polygon_index].vertices = 
+                        malloc(sizeof(point)*DEFAULT_NUM_POINTS);
+
                     int vertices_size = DEFAULT_NUM_POINTS;
                     int vertices_index = 0;
 
@@ -159,7 +163,10 @@ region* read_map_data (char* file_name)
 
                             // reached end of point, save it to the polygon
                             if (vertices_index >= vertices_size) { //Buffer is out of space, reallocate
-                                point* temp_vertices = realloc(regions[region_index].polygons[polygon_index].vertices, sizeof(point)*vertices_size*2);
+
+                                point* temp_vertices = realloc(regions[region_index].
+                                        polygons[polygon_index].vertices, sizeof(point)*vertices_size*2);
+
                                 if (temp_vertices == NULL) {
                                     fprintf(stderr, "Problem reallocing vertices buffer\n");
                                     exit(EXIT_FAILURE);
@@ -170,19 +177,28 @@ region* read_map_data (char* file_name)
                                 }
 
                             }
-                            float x = 1.1; //scanf("f", buffer);
-                            float y = 2.2; //scanf("f", buffer);
-                            free (buffer);
+
+                            if (debug) fprintf(stdout, "\t\tbuffer_point: %s saved_val: ", buffer);
+                            char* pCh = strtok(buffer, ",");
+                            char* pEnd;
+                            double x = strtod(pCh, &pEnd);
+                            pCh = strtok(NULL, ",");
+                            double y = strtod(pCh, &pEnd);
+                            if (debug) fprintf(debug_file, 
+                                    "Storing point (%.2f,%.2f) in region_%d, polygon %d vertex_%d\n",
+                                    x,y,region_index,polygon_index,vertices_index);
                             regions[region_index].polygons[polygon_index].vertices[vertices_index].x = x;
                             regions[region_index].polygons[polygon_index].vertices[vertices_index].y = y;
+                            free (buffer);
 
+                            vertices_index++;
                         } // end if (
 
-                        vertices_index++;
                         c = getc(file);
                     } // end while != ]
                     //reached end of polygon, save it now to region
                     
+                    if (debug) fprintf(stdout, "num_verts: %d\n", num_verts);
                     regions[region_index].polygons[polygon_index].num_vertices = num_verts;
 
                     polygon_index++;
@@ -198,11 +214,5 @@ region* read_map_data (char* file_name)
         } // end if
     }// end while
 
-    int in = 0;
-    for (in = 0; in < region_index; in++) {
-        if (debug) fprintf(stdout, "%s\n", regions[in].name);
-    }
-
     return regions;
-            
 }

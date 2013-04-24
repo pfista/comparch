@@ -1,1 +1,24 @@
 Reading map data from file: maps/test1.boo
+Storing point (0.00,1.00) in region_0, polygon 0 vertex_0
+Storing point (0.00,2.00) in region_0, polygon 0 vertex_1
+Storing point (2.00,2.00) in region_0, polygon 0 vertex_2
+Storing point (2.00,1.00) in region_0, polygon 0 vertex_3
+Storing point (0.00,1.00) in region_0, polygon 0 vertex_4
+Storing point (1.00,0.00) in region_1, polygon 0 vertex_0
+Storing point (3.00,0.00) in region_1, polygon 0 vertex_1
+Storing point (3.00,1.00) in region_1, polygon 0 vertex_2
+Storing point (1.00,1.00) in region_1, polygon 0 vertex_3
+Storing point (1.00,0.00) in region_1, polygon 0 vertex_4
+Storing point (1.00,1.00) in region_1, polygon 1 vertex_0
+Storing point (3.00,2.00) in region_1, polygon 1 vertex_1
+Storing point (2.00,2.00) in region_1, polygon 1 vertex_2
+Storing point (1.00,1.00) in region_1, polygon 1 vertex_3
+Storing point (3.00,0.00) in region_2, polygon 0 vertex_0
+Storing point (3.00,1.00) in region_2, polygon 0 vertex_1
+Storing point (4.00,1.00) in region_2, polygon 0 vertex_2
+Storing point (4.10,0.00) in region_2, polygon 0 vertex_3
+Storing point (3.00,0.00) in region_2, polygon 0 vertex_4
+Storing point (1111111111111.00,1.00) in region_2, polygon 1 vertex_0
+Storing point (-3.23,2.00) in region_2, polygon 1 vertex_1
+Storing point (2.00,2.00) in region_2, polygon 1 vertex_2
+Storing point (1.00,1.00) in region_2, polygon 1 vertex_3

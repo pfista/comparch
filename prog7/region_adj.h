@@ -1,8 +1,9 @@
 #include "global.h"
 
 /* x, y pair, could be ints or floats */
-typedef  struct point {
-    float x, y;
+typedef struct point {
+    double x;
+    double y;
 }point;
 
 /* set of points defining a closed area
