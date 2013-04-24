@@ -11,9 +11,16 @@
 #include <string.h>
 
 typedef short Boolean;
+FILE *debug_file;
+Boolean debug;
+
 #define TRUE 1
 #define FALSE 0
 
-FILE *debug_file;
+#define DEFAULT_REGION_SIZE 1
+#define DEFAULT_BUFFER_SIZE 10
+#define DEFAULT_POLYGON_SIZE 8
+#define DEFAULT_NUM_POINTS 8
+
 
 #endif

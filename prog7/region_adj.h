@@ -1,15 +1,22 @@
 #include "global.h"
 
+/* x, y pair, could be ints or floats */
 typedef  struct point {
-
+    float x, y;
 }point;
 
+/* set of points defining a closed area
+ start and end with the same point */
 typedef struct polygon {
-
+    point* vertices;
+    int num_vertices;
 }polygon;
 
+/* Set of polygons */
 typedef struct region {
-
+    polygon* polygons;
+    int num_polygons;
+    char* name;
 }region;
 
 Boolean is_adjacent_region (region* r1, region* r2);

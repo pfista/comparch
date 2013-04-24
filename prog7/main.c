@@ -1,4 +1,5 @@
 #include "global.h"
+#include "process_file.h"
 
 Boolean debug = FALSE;
 
@@ -19,7 +20,7 @@ void scanargs(char* s)
                 debug = TRUE;
                 if (debug)
                     {
-                        debug_file = fopen("DEBUG_LOG", "w");
+                        debug_file = fopen("debug.log", "w");
                         if (debug_file == NULL)
                             {
                                 fprintf(stderr, "Cannot open DEBUG_LOG\n");
@@ -52,7 +53,10 @@ int main (int argc, char * argv[] ) {
             exit(-1);
         }
 
+    if (debug) fprintf(debug_file, "Reading map data from file: %s\n", argv[0]);
+    read_map_data(argv[0]);
 
-return(0);
+
+    return(0);
 
 }
