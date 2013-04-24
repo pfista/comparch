@@ -7,7 +7,6 @@ int skip_blanks(FILE *file)
     return(c);
 }
 
-
 int skip_line(FILE *file)
 {
     int c;
@@ -21,7 +20,7 @@ int read_until(FILE* file, char** buffer_ptr, int size, char end_delim) {
     int c = getc(file);
     while (c != end_delim) {
         if (i >= size-1) { // -1 to save space for '\0'
-            char* temp_buff = realloc (*buffer_ptr, size*2);
+            char* temp_buff = realloc (*buffer_ptr, sizeof(char)*size*2);
             if (temp_buff == NULL) {
                 fprintf(stderr, "Error reallocing memory for buffer\n");
                 exit(EXIT_FAILURE);
@@ -85,7 +84,7 @@ region* read_map_data (char* file_name)
 
             if (region_index >= region_size) { // Realloc if necessary
                 if (debug) fprintf(stdout, "Region index >= region_size\n", region_size);
-                region* temp_regions = realloc(regions, region_size*2);
+                region* temp_regions = realloc(regions, sizeof(region)*region_size*2);
                 if (temp_regions == NULL) {
                     fprintf(stderr, "Problem reallocing regions buffer\n");
                     exit(EXIT_FAILURE);
@@ -96,9 +95,10 @@ region* read_map_data (char* file_name)
                 region_size *= 2;
             }
 
-            // Store the name in memory, free the buffer
             if (debug) fprintf(stdout, "regionIndex:%d",region_index);
             if (debug) fprintf(stdout," Name:_%s_\n",buffer);
+
+            // Store the name in memory, free the buffer
             regions[region_index].name = malloc(sizeof(char)*(name_size));
             if (regions[region_index].name == NULL) {
                 fprintf(stderr, "Error mallocing name in region\n");
@@ -128,7 +128,7 @@ region* read_map_data (char* file_name)
 
                     if (polygon_index >= polygon_size) {
                         // Buffer is out of space, reallocate
-                        polygon* temp_polygons = realloc(regions[region_index].polygons, polygon_size*2);
+                        polygon* temp_polygons = realloc(regions[region_index].polygons, sizeof(polygon)*polygon_size*2);
                         if (temp_polygons == NULL){
                             fprintf(stderr, "Problem reallocing polygon buffer\n");
                             exit(EXIT_FAILURE);
@@ -159,7 +159,7 @@ region* read_map_data (char* file_name)
 
                             // reached end of point, save it to the polygon
                             if (vertices_index >= vertices_size) { //Buffer is out of space, reallocate
-                                point* temp_vertices = realloc(regions[region_index].polygons[polygon_index].vertices, vertices_size*2);
+                                point* temp_vertices = realloc(regions[region_index].polygons[polygon_index].vertices, sizeof(point)*vertices_size*2);
                                 if (temp_vertices == NULL) {
                                     fprintf(stderr, "Problem reallocing vertices buffer\n");
                                     exit(EXIT_FAILURE);
@@ -204,6 +204,5 @@ region* read_map_data (char* file_name)
     }
 
     return regions;
-
             
 }
