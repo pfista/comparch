@@ -1,6 +1,6 @@
 #include "global.h"
 
-#define STACK_SIZE 5
+#define STACK_SIZE 500
 
 typedef struct Stack
 {

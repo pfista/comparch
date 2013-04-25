@@ -2,8 +2,7 @@
 
 /* x, y pair, could be ints or floats */
 typedef struct point {
-    double x;
-    double y;
+    double x, y;
 }point;
 
 /* set of points defining a closed area
@@ -26,4 +25,4 @@ Boolean is_adjacent_polygon (polygon* p1, polygon* p2);
 
 Boolean lines_intersect (point* a1, point* a2, point* b1, point* b2);
 
-void process_map_data (void);
+void process_map_data (region* regions);

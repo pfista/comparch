@@ -56,20 +56,8 @@ int main (int argc, char * argv[] ) {
     if (debug) fprintf(debug_file, "Reading map data from file: %s\n", argv[0]);
     region* regions = read_map_data(argv[0]);
 
-    int i = 0;
-    while (regions[i].polygons != NULL) {
-        if (debug) fprintf(stdout, "%s\n", regions[i].name);
-            int j = 0;
-            for (j = 0; j < regions[i].num_polygons; j++) {
-                fprintf(stdout, "\tpoly_%d\n", j);
-                int h = 0;
-                for (h = 0; h < regions[i].polygons[j].num_vertices; h++) {
-                    fprintf(stdout, "\t\tpoint_%d: %.2f,%.2f\n", h, regions[i].polygons[j].vertices[h].x,
-                            regions[i].polygons[j].vertices[h].y);
-                }
-            }
-            i++;
-    }
+    process_map_data(regions);
+
 
 
     return(0);

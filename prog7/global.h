@@ -17,10 +17,10 @@ Boolean debug;
 #define TRUE 1
 #define FALSE 0
 
-#define DEFAULT_REGION_SIZE 4
+#define DEFAULT_REGION_SIZE 50
 #define DEFAULT_BUFFER_SIZE 50
-#define DEFAULT_POLYGON_SIZE 3
-#define DEFAULT_NUM_POINTS 10
+#define DEFAULT_POLYGON_SIZE 8
+#define DEFAULT_NUM_POINTS 8
 
 
 #endif

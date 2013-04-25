@@ -3,22 +3,18 @@
 int skip_blanks(FILE *file)
 {
     int c;
-    while (((c = getc(file)) != EOF) && isspace(c)) /* keep reading */;
-    return(c);
-}
-
-int skip_line(FILE *file)
-{
-    int c;
-    while (((c = getc(file)) != EOF) && (c != '\n')) /* keep reading */;
-    c = skip_blanks(file);
+    while (((c = getc(file)) != EOF) && isspace(c))
+        if (c == '\n')
+            line_number++;
     return(c);
 }
 
 int read_until(FILE* file, char** buffer_ptr, int size, char end_delim) {
     int i = 0;
     int c = getc(file);
-    while (c != end_delim) {
+    while (c != EOF && c != end_delim) {
+        if (!check_parens(c))
+            exit(EXIT_FAILURE);
         if (i >= size-1) { // -1 to save space for '\0'
             char* temp_buff = realloc (*buffer_ptr, sizeof(char)*size*2);
             if (temp_buff == NULL) {
@@ -31,18 +27,49 @@ int read_until(FILE* file, char** buffer_ptr, int size, char end_delim) {
             }
         }
         
-        if (c == '\n') { // ignore line breaks;
-            c = getc(file);
-            continue;
-        }
-
         (*buffer_ptr)[i] = c;
         i++;
 
         c = getc(file);
     }
+    if (!check_parens(c))
+        exit(EXIT_FAILURE);
     (*buffer_ptr)[i] = '\0';
     return i+1;
+}
+
+Boolean check_parens(char c) {
+    switch (c) {
+        case '}':
+            if (pop(parens) != '{') {
+                fprintf(stderr, "Poorly nested parenthesis at line %d\n", line_number);
+                return FALSE;
+            }
+            else return TRUE;
+        break;
+
+        case ')':
+            if (pop(parens) != '(') {
+                fprintf(stderr, "Poorly nested parenthesis at line %d\n", line_number);
+                return FALSE;
+            }
+            else return TRUE;
+        break;
+
+        case ']':
+            if (pop(parens) != '[') {
+                fprintf(stderr, "Poorly nested parenthesis at line %d\n", line_number);
+                return FALSE;
+            }
+            else return TRUE;
+        break;
+
+        case '\n':
+            line_number++;
+
+        default: 
+            return TRUE;
+    }
 }
 
 region* read_map_data (char* file_name)
@@ -53,16 +80,17 @@ region* read_map_data (char* file_name)
         exit(EXIT_FAILURE);
     }
 
-    Stack* parens = malloc(sizeof(Stack));
+    /* init global vars */
+    parens = malloc(sizeof(Stack));
     init (parens);
+    line_number = 1;
+    
 
     int c;
-
     c = skip_blanks(file);
     ungetc(c, file);
-    if (c == EOF) return;
+    if (c == EOF) return NULL;
     
-    int line_number = 1;
 
     // Initialize the array of regions
     region* regions = malloc(sizeof(region)*DEFAULT_REGION_SIZE);
@@ -72,31 +100,29 @@ region* read_map_data (char* file_name)
 
 
     while ((c = getc(file)) != EOF) {
-        if (c == '{') {
-            fprintf(stdout, "Creating New Region\n");
-            // Create new region
+        if (c == '{') { // Create new region
+            push(parens, '{'); // add to stack
+
             c = skip_blanks(file);
             ungetc(c, file);
             char* buffer = malloc(sizeof(char)*DEFAULT_BUFFER_SIZE);
+            if (buffer == NULL) {
+                fprintf(stderr, "Error mallocing buffer\n");
+                exit(EXIT_FAILURE);
+            }
 
             int name_size = read_until(file, &buffer, DEFAULT_BUFFER_SIZE, ',');
-            if (debug) fprintf(stdout, "region_size: %d\n", region_size);
 
+            /* Make sure buffer can hold info */
             if (region_index >= region_size) { // Realloc if necessary
-                if (debug) fprintf(stdout, "Region index >= region_size\n", region_size);
                 region* temp_regions = realloc(regions, sizeof(region)*region_size*2);
                 if (temp_regions == NULL) {
                     fprintf(stderr, "Problem reallocing regions buffer\n");
                     exit(EXIT_FAILURE);
                 }
-
-                if (debug) fprintf(stdout, "Increasing region_size buffer\n");
                 regions = temp_regions;
                 region_size *= 2;
             }
-
-            if (debug) fprintf(stdout, "regionIndex:%d",region_index);
-            if (debug) fprintf(stdout," Name:_%s_\n",buffer);
 
             // Store the name in memory, free the buffer
             regions[region_index].name = malloc(sizeof(char)*(name_size));
@@ -109,17 +135,17 @@ region* read_map_data (char* file_name)
             free (buffer);
 
             c = skip_blanks(file);
+            if (!check_parens(c))
+                exit(EXIT_FAILURE);
 
             regions[region_index].polygons = malloc(sizeof(polygon)*DEFAULT_POLYGON_SIZE);
             int polygon_size = DEFAULT_POLYGON_SIZE; // Keeps track of buffer size for polgyons
             int polygon_index = 0;
-        
 
             // Now read all the polygons
             while (c != '}') {
-
                 if (c == '[') {
-                    fprintf(stdout, "\tCreating New Polygon\n");
+                    push(parens, '[');
                     // Create new polygon to go inside of region
                     
                     int num_verts = 0;
@@ -148,9 +174,8 @@ region* read_map_data (char* file_name)
                     int vertices_index = 0;
 
                     while (c != ']') {
-                    
-
                         if (c == '(') {
+                            push(parens, '(');
                             // Create new point to go inside polygon
                             // read until ')'
                             buffer = malloc(sizeof(char)*DEFAULT_BUFFER_SIZE);
@@ -163,7 +188,6 @@ region* read_map_data (char* file_name)
 
                             // reached end of point, save it to the polygon
                             if (vertices_index >= vertices_size) { //Buffer is out of space, reallocate
-
                                 point* temp_vertices = realloc(regions[region_index].
                                         polygons[polygon_index].vertices, sizeof(point)*vertices_size*2);
 
@@ -175,43 +199,42 @@ region* read_map_data (char* file_name)
                                     regions[region_index].polygons[polygon_index].vertices = temp_vertices;
                                     vertices_size *= 2;
                                 }
-
                             }
 
-                            if (debug) fprintf(stdout, "\t\tbuffer_point: %s saved_val: ", buffer);
+                            // Parse point of format "1.0,1.0" into x and y floats
                             char* pCh = strtok(buffer, ",");
                             char* pEnd;
                             double x = strtod(pCh, &pEnd);
                             pCh = strtok(NULL, ",");
                             double y = strtod(pCh, &pEnd);
+
                             if (debug) fprintf(debug_file, 
-                                    "Storing point (%.2f,%.2f) in region_%d, polygon %d vertex_%d\n",
+                                    "Storing point (%.2f,%.2f) in r_%d, p_%d v_%d\n",
                                     x,y,region_index,polygon_index,vertices_index);
                             regions[region_index].polygons[polygon_index].vertices[vertices_index].x = x;
                             regions[region_index].polygons[polygon_index].vertices[vertices_index].y = y;
                             free (buffer);
-
                             vertices_index++;
                         } // end if (
-
                         c = getc(file);
+                            if (!check_parens(c))
+                                exit(EXIT_FAILURE);
                     } // end while != ]
                     //reached end of polygon, save it now to region
-                    
-                    if (debug) fprintf(stdout, "num_verts: %d\n", num_verts);
                     regions[region_index].polygons[polygon_index].num_vertices = num_verts;
-
                     polygon_index++;
-
                 }// end if [
 
                 c = getc(file);
+                if (!check_parens(c))
+                    exit(EXIT_FAILURE);
             } // end while != 
             //reached end of region, save it
             regions[region_index].num_polygons = polygon_index;
             region_index++;
-            
         } // end if
+        if (c == '\n')
+            line_number++;
     }// end while
 
     return regions;
