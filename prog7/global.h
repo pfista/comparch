@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 
 typedef short Boolean;
 FILE *debug_file;
@@ -22,5 +23,6 @@ Boolean debug;
 #define DEFAULT_POLYGON_SIZE 8
 #define DEFAULT_NUM_POINTS 8
 
+#define EPSILON .0000001
 
 #endif

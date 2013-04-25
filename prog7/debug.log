@@ -1,0 +1,32 @@
+Reading map data from file: maps/test1.boo
+Storing point (0.00,1.00) in r_0, p_0 v_0
+Storing point (0.00,2.00) in r_0, p_0 v_1
+Storing point (2.00,2.00) in r_0, p_0 v_2
+Storing point (2.00,1.00) in r_0, p_0 v_3
+Storing point (0.00,1.00) in r_0, p_0 v_4
+Storing point (1.00,0.00) in r_1, p_0 v_0
+Storing point (3.00,0.00) in r_1, p_0 v_1
+Storing point (3.00,1.00) in r_1, p_0 v_2
+Storing point (1.00,1.00) in r_1, p_0 v_3
+Storing point (1.00,0.00) in r_1, p_0 v_4
+Storing point (3.00,0.00) in r_2, p_0 v_0
+Storing point (3.00,1.00) in r_2, p_0 v_1
+Storing point (4.10,1.00) in r_2, p_0 v_2
+Storing point (4.10,0.00) in r_2, p_0 v_3
+Storing point (3.00,0.00) in r_2, p_0 v_4
+Comparing Region1:Region2
+	intercepts equal 		1.00 | 1.00
+		 maxA2.00 minA0.00 maxB3.00 minB1.00
+Comparing Region1:Region3
+	intercepts equal 		1.00 | 1.00
+		 maxA2.00 minA0.00 maxB4.10 minB3.00
+Comparing Region2:Region1
+	intercepts equal 		1.00 | 1.00
+		 maxA3.00 minA1.00 maxB2.00 minB0.00
+Comparing Region2:Region3
+	intercepts equal 		0.00 | 0.00
+		 maxA3.00 minA1.00 maxB4.10 minB3.00
+Comparing Region3:Region1
+	intercepts equal 		1.00 | 1.00
+		 maxA4.10 minA3.00 maxB2.00 minB0.00
+Comparing Region3:Region2
