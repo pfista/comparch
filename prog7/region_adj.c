@@ -10,7 +10,7 @@ Boolean is_adjacent_region (region* r1, region* r2)
 
 
             //Check all polygons in r1 against r2
-            if (debug) fprintf(debug_file, "Comparing %s:%s\n", r1->name, r2->name);
+            //if (debug) fprintf(debug_file, "Comparing %s:%s\n", r1->name, r2->name);
             int i,j;
             for (i = 0; i < r1->num_polygons; i++) {
                 for (j = 0; j < r2->num_polygons; j++) {
@@ -19,28 +19,27 @@ Boolean is_adjacent_region (region* r1, region* r2)
                 }
             }
         }
-        else {
-            if (debug) fprintf(debug_file, "Failed Y for %s:%s : %.2f %.2f %.2f %.2f\n", r1->name,r2->name, r1->box.max_y, r2->box.min_y, r1->box.min_y, r2->box.max_y);
-
-        }
-    }
-    else {
-            if (debug) fprintf(debug_file, "Failed X for %s:%s : %.2f %.2f %.2f %.2f\n", r1->name, r2->name, r1->box.max_x, r2->box.min_x, r1->box.min_x, r2->box.max_x);
-
     }
     return(FALSE);
 }
 
 Boolean is_adjacent_polygon (polygon* p1, polygon* p2) 
 {
-    int i,j;
-    for (i = 0; i < p1->num_vertices-1; i++){
-        for (j = 0; j < p2->num_vertices-1; j++) {
-            if (lines_intersect(&p1->vertices[i], &p1->vertices[i+1], &p2->vertices[j], &p2->vertices[j+1]))
-                return(TRUE);
+    if (p1->box.max_x >= p2->box.min_x && p1->box.min_x <= p2->box.max_x) {
+        if (p1->box.max_y >= p2->box.min_y && p1->box.min_y <= p2->box.max_y) {
+
+           int i,j;
+            for (i = 0; i < p1->num_vertices-1; i++){
+                for (j = 0; j < p2->num_vertices-1; j++) {
+                    if (lines_intersect(&p1->vertices[i], &p1->vertices[i+1],
+                                &p2->vertices[j], &p2->vertices[j+1]))
+                        return(TRUE);
+                }
+            }
         }
     }
     return(FALSE);
+
 }
 
 Boolean lines_intersect (point* a1, point* a2, point* b1, point* b2) 
@@ -76,9 +75,6 @@ Boolean lines_intersect (point* a1, point* a2, point* b1, point* b2)
             double min_x_a = a1->x < a2->x ? a1->x : a2->x;
             double min_x_b = b1->x < b2->x ? b1->x : b2->x;
             double max_x_b = b1->x > b2->x ? b1->x : b2->x;
-            if (debug) fprintf(debug_file, "\tintercepts equal \t\t%.2f | %.2f\n", a_y_intercept, b_y_intercept);
-            if (debug) fprintf(debug_file, "\t\t maxA%.2f minA%.2f maxB%.2f minB%.2f\n", max_x_a, min_x_a, max_x_b,
-                min_x_b);
             if (max_x_a > min_x_b && min_x_a < max_x_b)
                 return(TRUE);
             else if (max_x_b > min_x_a && min_x_b < max_x_a)

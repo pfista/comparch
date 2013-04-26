@@ -98,6 +98,11 @@ region* read_map_data (char* file_name)
     int region_index = 0;
     Boolean min_max_set = FALSE;
     bbox r_box;
+    //Add dummy values to get rid of warning;
+    r_box.min_x = 0;
+    r_box.max_x = 0;
+    r_box.min_y = 0;
+    r_box.max_y = 0;
 
 
     while ((c = getc(file)) != EOF) {
@@ -142,15 +147,19 @@ region* read_map_data (char* file_name)
             regions[region_index].polygons = malloc(sizeof(polygon)*DEFAULT_POLYGON_SIZE);
             int polygon_size = DEFAULT_POLYGON_SIZE; // Keeps track of buffer size for polgyons
             int polygon_index = 0;
+            bbox p_box;
+            // Add dummy values to prevent warning
+            p_box.min_x = 0;
+            p_box.max_x = 0;
+            p_box.min_y = 0;
+            p_box.max_y = 0;
+            Boolean p_min_max_set = FALSE;
 
             // Now read all the polygons
             while (c != '}') {
                 if (c == '[') {
                     push(parens, '[');
                     // Create new polygon to go inside of region
-                    
-                    int num_verts = 0;
-
                     c = skip_blanks(file);
 
                     if (polygon_index >= polygon_size) {
@@ -185,7 +194,6 @@ region* read_map_data (char* file_name)
                                 exit(EXIT_FAILURE);
                             }
                             read_until(file, &buffer, DEFAULT_BUFFER_SIZE, ')');
-                            num_verts++;
 
                             // reached end of point, save it to the polygon
                             if (vertices_index >= vertices_size) { //Buffer is out of space, reallocate
@@ -233,6 +241,24 @@ region* read_map_data (char* file_name)
                                     r_box.max_y = y;
                             }
 
+                            if (!p_min_max_set) {
+                                p_min_max_set = TRUE;
+                                p_box.min_x = x;
+                                p_box.max_x = x;
+                                p_box.min_y = y;
+                                p_box.max_y = y;
+                            }
+                            else {
+                                if (x < p_box.min_x)
+                                    p_box.min_x = x;
+                                if (x > p_box.max_x)
+                                    p_box.max_x = x;
+                                if (y < p_box.min_y)
+                                    p_box.min_y = y;
+                                if (y > p_box.max_y)
+                                    p_box.max_y = y;
+                            }
+
                             free (buffer);
                             vertices_index++;
                         } // end if (
@@ -241,7 +267,13 @@ region* read_map_data (char* file_name)
                                 exit(EXIT_FAILURE);
                     } // end while != ]
                     //reached end of polygon, save it now to region
-                    regions[region_index].polygons[polygon_index].num_vertices = num_verts;
+
+                    regions[region_index].polygons[polygon_index].box.max_x = p_box.max_x;
+                    regions[region_index].polygons[polygon_index].box.min_x = p_box.min_x;
+                    regions[region_index].polygons[polygon_index].box.max_y = p_box.max_y;
+                    regions[region_index].polygons[polygon_index].box.min_y = p_box.min_y;
+                    p_min_max_set = FALSE;
+                    regions[region_index].polygons[polygon_index].num_vertices = vertices_index;
                     polygon_index++;
                 }// end if [
 

@@ -18,6 +18,7 @@ typedef struct bbox {
 typedef struct polygon {
     point* vertices;
     int num_vertices;
+    bbox box;
 }polygon;
 
 /* Set of polygons */
