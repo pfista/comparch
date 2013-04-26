@@ -250,10 +250,10 @@ region* read_map_data (char* file_name)
                     exit(EXIT_FAILURE);
             } // end while != 
             // Copy the actual max's and min's to the region
-            regions[region_index].box.max_x = r_box.max_x;// fabs(r_box.max_x*.5);
-            regions[region_index].box.min_x = r_box.min_x;// fabs(r_box.min_x*.5);
-            regions[region_index].box.max_y = r_box.max_y;// fabs(r_box.max_y*.5);
-            regions[region_index].box.min_y = r_box.min_y;// fabs(r_box.min_y*.5);
+            regions[region_index].box.max_x = r_box.max_x;
+            regions[region_index].box.min_x = r_box.min_x;
+            regions[region_index].box.max_y = r_box.max_y;
+            regions[region_index].box.min_y = r_box.min_y;
             min_max_set = FALSE;
 
             //reached end of region, save it
