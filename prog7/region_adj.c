@@ -4,14 +4,29 @@
 Boolean is_adjacent_region (region* r1, region* r2) 
 {
     //TODO make this faster with bounding boxes
-    //Check all polygons in r1 against r2
-    if (debug) fprintf(debug_file, "Comparing %s:%s\n", r1->name, r2->name);
-    int i,j;
-    for (i = 0; i < r1->num_polygons; i++) {
-        for (j = 0; j < r2->num_polygons; j++) {
-            if (is_adjacent_polygon(&r1->polygons[i], &r2->polygons[j]))
-                return(TRUE);
+
+    if (r1->box.max_x >= r2->box.min_x && r1->box.min_x <= r2->box.max_x) {
+        if (r1->box.max_y >= r2->box.min_y && r1->box.min_y <= r2->box.max_y) {
+
+
+            //Check all polygons in r1 against r2
+            if (debug) fprintf(debug_file, "Comparing %s:%s\n", r1->name, r2->name);
+            int i,j;
+            for (i = 0; i < r1->num_polygons; i++) {
+                for (j = 0; j < r2->num_polygons; j++) {
+                    if (is_adjacent_polygon(&r1->polygons[i], &r2->polygons[j]))
+                        return(TRUE);
+                }
+            }
         }
+        else {
+            if (debug) fprintf(debug_file, "Failed Y for %s:%s : %.2f %.2f %.2f %.2f\n", r1->name,r2->name, r1->box.max_y, r2->box.min_y, r1->box.min_y, r2->box.max_y);
+
+        }
+    }
+    else {
+            if (debug) fprintf(debug_file, "Failed X for %s:%s : %.2f %.2f %.2f %.2f\n", r1->name, r2->name, r1->box.max_x, r2->box.min_x, r1->box.min_x, r2->box.max_x);
+
     }
     return(FALSE);
 }
@@ -79,8 +94,6 @@ void process_map_data (region* regions) {
     int i = 0, j = 0;
     Boolean region = FALSE;
     Boolean first = TRUE;
-
-    //TODO make this faster with bounding boxes
 
     /* Check all regions against each other that are in the same bounding box */
     while (regions[i].polygons != NULL) {

@@ -96,7 +96,8 @@ region* read_map_data (char* file_name)
     region* regions = malloc(sizeof(region)*DEFAULT_REGION_SIZE);
     int region_size = DEFAULT_REGION_SIZE;
     int region_index = 0;
-
+    Boolean min_max_set = FALSE;
+    bbox r_box;
 
 
     while ((c = getc(file)) != EOF) {
@@ -213,6 +214,25 @@ region* read_map_data (char* file_name)
                                     x,y,region_index,polygon_index,vertices_index);
                             regions[region_index].polygons[polygon_index].vertices[vertices_index].x = x;
                             regions[region_index].polygons[polygon_index].vertices[vertices_index].y = y;
+
+                            if (!min_max_set) {
+                                r_box.min_x = x;
+                                r_box.max_x = x;
+                                r_box.min_y = y;
+                                r_box.max_y = y;
+                                min_max_set = TRUE;
+                            }
+                            else { /* Update bounding box max and mins for current region */
+                                if (x < r_box.min_x)
+                                    r_box.min_x = x;
+                                if (x > r_box.max_x)
+                                    r_box.max_x = x;
+                                if (y < r_box.min_y)
+                                    r_box.min_y = y;
+                                if (y > r_box.max_y)
+                                    r_box.max_y = y;
+                            }
+
                             free (buffer);
                             vertices_index++;
                         } // end if (
@@ -229,6 +249,13 @@ region* read_map_data (char* file_name)
                 if (!check_parens(c))
                     exit(EXIT_FAILURE);
             } // end while != 
+            // Copy the actual max's and min's to the region
+            regions[region_index].box.max_x = r_box.max_x;// fabs(r_box.max_x*.5);
+            regions[region_index].box.min_x = r_box.min_x;// fabs(r_box.min_x*.5);
+            regions[region_index].box.max_y = r_box.max_y;// fabs(r_box.max_y*.5);
+            regions[region_index].box.min_y = r_box.min_y;// fabs(r_box.min_y*.5);
+            min_max_set = FALSE;
+
             //reached end of region, save it
             regions[region_index].num_polygons = polygon_index;
             region_index++;

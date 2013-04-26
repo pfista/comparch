@@ -5,6 +5,14 @@ typedef struct point {
     double x, y;
 }point;
 
+/* Bounding box */
+typedef struct bbox {
+    double min_x;
+    double min_y;
+    double max_x;
+    double max_y;
+}bbox;
+
 /* set of points defining a closed area
  start and end with the same point */
 typedef struct polygon {
@@ -16,6 +24,7 @@ typedef struct polygon {
 typedef struct region {
     polygon* polygons;
     int num_polygons;
+    bbox box;
     char* name;
 }region;
 
